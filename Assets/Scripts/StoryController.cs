@@ -21,11 +21,20 @@ public class StoryController : MonoBehaviour {
     public Image _guyAngry;
     public Image _redFilter;
     public Image _greenFilter;
+    public GameObject _answerOptions;
+    public AnswerButtonScript _answerButton1;
+    public AnswerButtonScript _answerButton2;
+    public AnswerButtonScript _answerButton3;
 
-    private bool _isResponse1Correct;//Sacar
-    private bool _isResponse2Correct;//
-    private bool _isResponse3Correct;//
     private Image _currentGuy;//Para saber cuál desactivar
+    private int _round = 0;
+
+    public struct Answer
+    {
+        public string answer;
+        public bool isTrusted;
+        public string reaction;
+    }
 
     //Pedir a un parser las frases
     private string _title;
@@ -35,13 +44,6 @@ public class StoryController : MonoBehaviour {
     private List<string> _outroSentenceGood = new List<string>();
     private List<string> _outroSentenceBad = new List<string>();
     //
-
-    private struct Answer
-    {
-        string answer;
-        bool isTrusted;
-        string reaction;
-    }
 
     private Answer _currentAnswer1;//variables intermedias
     private Answer _currentAnswer2;
@@ -77,67 +79,151 @@ public class StoryController : MonoBehaviour {
         _gauge.SetActive(true);
         _guyAngry.enabled = true;
         _currentGuy = _guyAngry;
-        _midPanelText.text = _firstReaction[0];//Se tendría que escoger aleatoriamente si se quiere hacer general  
+        _chapterIntroText.enabled = false;
+        _midPanelText.text = _firstReaction[0];//Se tendría que escoger aleatoriamente si se quiere hacer general 
     }
 
     public void OnFinishButtonPressed()
     {
-
+        //Comprobar si se ha ganado y desbloquear pantalla en caso afirmativo, pasar referencia a CanvasManager de este objeto para que lo pueda destruir
     }
 
     public void OnReactionButtonPressed()
     {
-        Debug.Log("middle button pressed");
+        PopulateCurrentAnswers();
+        _currentGuy.enabled = false;
+        if (_currentGuy == _guyAngry) { _currentGuy = _guyWaiting; }
+        if (_currentGuy == _guyThinking) { _currentGuy = _guyIdle; }
+        _currentGuy.enabled = true;
+        _middlePanel.SetActive(false);
+        _lowerPanel.SetActive(true);
+        _answerOptions.SetActive(true);
+        _answerButton1.SetText(_currentAnswer1.answer);
+        _answerButton2.SetText(_currentAnswer2.answer);
+        _answerButton3.SetText(_currentAnswer3.answer);
+
     }
 
     public void OnFirstResponsePressed()
     {
-        if (_isResponse1Correct)
+        if (_currentAnswer1.isTrusted)
         {
-            CorrectAnswerBehavior();
+            CorrectAnswerBehavior(_currentAnswer1.reaction);
         }
         else
         {
-            WrongAnswerBehavior();
+            WrongAnswerBehavior(_currentAnswer1.reaction);
         }
     }
 
     public void OnSecondResponsePressed()
     {
-        if (_isResponse2Correct)
+        if (_currentAnswer2.isTrusted)
         {
-            CorrectAnswerBehavior();
+            CorrectAnswerBehavior(_currentAnswer2.reaction);
         }
         else
         {
-            WrongAnswerBehavior();
+            WrongAnswerBehavior(_currentAnswer2.reaction);
         }
     }
 
     public void OnThirdResponsePressed()
     {
-        if (_isResponse3Correct)
+        if (_currentAnswer3.isTrusted)
         {
-            CorrectAnswerBehavior();
+            CorrectAnswerBehavior(_currentAnswer3.reaction);
         }
         else
         {
-            WrongAnswerBehavior();
+            WrongAnswerBehavior(_currentAnswer3.reaction);
         }
     }
 
-    void CorrectAnswerBehavior()
+    void CorrectAnswerBehavior(string reaction)
     {
 
     }
 
-    void WrongAnswerBehavior()
+    void WrongAnswerBehavior(string reaction)
     {
 
+    }
+
+    void PopulateCurrentAnswers()
+    {
+        //TODO Hacer aleatorio
+        _currentAnswer1 = _answers[_round, 0];
+        _currentAnswer2 = _answers[_round, 1];
+        _currentAnswer3 = _answers[_round, 2];
+        _round++;
     }
 
     void PopulateAnswersStructs()
     {
-        //TODO Tocho para popular todos los structs, cuando todas las transiciones funcionen guay habrá que hacer esto bien
+        //Tocho para poblar todos los structs, cuando todas las transiciones funcionen guay habrá que hacer esto bien
+        _answers[0, 0].answer = "¡Yo no he sido!";
+        _answers[0, 0].isTrusted = true;
+        _answers[0, 0].reaction = "Mmmm... Pues hay testigos que aseguran haberte visto merodeando por aquí.";
+
+        _answers[0, 1].answer = "He visto a Norman merodeando por la zona.";
+        _answers[0, 1].isTrusted = false;
+        _answers[0, 1].reaction = "Pero si Norman hoy no trabaja. Además, hay testigos que aseguran haberte visto merodeando por aquí.";
+
+        _answers[0, 2].answer = "¡Has sido tú!";
+        _answers[0, 2].isTrusted = false;
+        _answers[0, 2].reaction = "¿¡Cómo quieres que estropee mi propia receta!? Además, hay testigos que aseguran haberte visto merodeando por aquí.";
+
+
+        _answers[1, 0].answer = "¿Quién te lo ha dicho?";
+        _answers[1, 0].isTrusted = true;
+        _answers[1, 0].reaction = "Jaime, pero es cierto que es bastante despistado. ¡No me confundas! Por tu culpa sanidad nos va a cerrar el restaurante.";
+
+        _answers[1, 1].answer = "Mi cara es muy común. Alguien se habrá confundido.";
+        _answers[1, 1].isTrusted = false;
+        _answers[1, 1].reaction = "Eres el más alto de la cocina. Es fácil reconocerte... Por tu culpa sanidad nos va a cerrar el restaurante.";
+
+        _answers[1, 2].answer = "¡No era yo! Ha sido mi hermano gemelo.";
+        _answers[1, 2].isTrusted = false;
+        _answers[1, 2].reaction = "¿Me tomas por tonto? Por tu culpa sanidad nos va a cerrar el restaurante.";
+
+
+        _answers[2, 0].answer = "¡Ha sido Jaime!";
+        _answers[2, 0].isTrusted = true;
+        _answers[2, 0].reaction = "¿Tienes pruebas? Creo que sólo quieres escaquearte... ¡Confiesa!";
+
+        _answers[2, 1].answer = "¿Por qué no hacemos como si no hubiera pasado nada?";
+        _answers[2, 1].isTrusted = false;
+        _answers[2, 1].reaction = "No te vas a escapar tan fácilmente de ésta. ¡Confiesa!";
+
+        _answers[2, 2].answer = "Sanidad no tiene por qué enterarse.";
+        _answers[2, 2].isTrusted = false;
+        _answers[2, 2].reaction = "Pero yo sí que me he enterado. ¡Confiesa!";
+
+
+        _answers[3, 0].answer = "Jaime te tiene envidia. Siempre ha querido tu puesto.";
+        _answers[3, 0].isTrusted = true;
+        _answers[3, 0].reaction = "¿Cómo sabes tú eso? Quiero saber la verdad.";
+
+        _answers[3, 1].answer = "Quizá ha sido un accidente.";
+        _answers[3, 1].isTrusted = false;
+        _answers[3, 1].reaction = "El accidente fue contratarte... Quiero saber la verdad.";
+
+        _answers[3, 2].answer = "Tienes enemigos en esta cocina.";
+        _answers[3, 2].isTrusted = false;
+        _answers[3, 2].reaction = "Y tú parece que eres uno de ellos. Quiero saber la verdad.";
+
+
+        _answers[4, 0].answer = "Me dijo que estaba cansado de tus gritos. ¡Yo no haría algo así!";
+        _answers[4, 0].isTrusted = true;
+        _answers[4, 0].reaction = "Este mensaje no debería estar apareciendo en pantalla. ¡Ups!";
+
+        _answers[4, 1].answer = "De todos modos, tu receta apesta.";
+        _answers[4, 1].isTrusted = false;
+        _answers[4, 1].reaction = "Este mensaje no debería estar apareciendo en pantalla. ¡Ups!";
+
+        _answers[4, 2].answer = "Creo que te precipitas asumiendo que he sido yo.";
+        _answers[4, 2].isTrusted = false;
+        _answers[4, 2].reaction = "Este mensaje no debería estar apareciendo en pantalla. ¡Ups!";
     }
 }

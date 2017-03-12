@@ -1,0 +1,54 @@
+﻿using UnityEngine;
+using System.Collections;
+using UnityEngine.UI;
+
+public class AnswerButtonScript : MonoBehaviour {
+
+    public Sprite _greenButtonImage;
+    public Sprite _redButtonImage;
+    public Sprite _normalButtonImage;
+    public Sprite _pressedButtonImage;
+
+    private Button _answerButton;
+    private Image _answerButtonImage;
+    private Text _answerButtonText;
+
+    void Awake () {
+        _answerButton = GetComponent<Button>();
+        if (!_answerButton) { Debug.LogWarning("No button found", this); }
+        _answerButtonImage = GetComponent<Image>();
+        if (!_answerButtonImage) { Debug.LogWarning("No image found", this); }
+        _answerButtonText = GetComponentInChildren<Text>();
+        if (!_answerButtonText) { Debug.LogWarning("No text found in child", this); }
+	}
+
+    public void DisableButton()
+    {
+        _answerButton.enabled = false;
+    }
+
+    public void EnableButton()
+    {
+        _answerButton.enabled = true;
+    }
+
+    public void SwapSpriteToRed()
+    {
+        _answerButtonImage.sprite = _redButtonImage;
+    }
+
+    public void SwapSpriteToGreen()
+    {
+        _answerButtonImage.sprite = _greenButtonImage;
+    }
+
+    public void SwapSpriteToNormal()
+    {
+        _answerButtonImage.sprite = _normalButtonImage;
+    }
+
+    public void SetText(string text)
+    {
+        _answerButtonText.text = text;
+    }
+}
