@@ -4,10 +4,10 @@ using UnityEngine.UI;
 
 public class AnswerButtonScript : MonoBehaviour {
 
-    public Sprite _greenButtonImage;
-    public Sprite _redButtonImage;
-    public Sprite _normalButtonImage;
-    public Sprite _pressedButtonImage;
+    public Sprite _greenButtonSprite;
+    public Sprite _redButtonSprite;
+    public Sprite _normalButtonSprite;
+    public Sprite _pressedButtonSprite;
 
     private Button _answerButton;
     private Image _answerButtonImage;
@@ -34,17 +34,17 @@ public class AnswerButtonScript : MonoBehaviour {
 
     public void SwapSpriteToRed()
     {
-        _answerButtonImage.sprite = _redButtonImage;
+        _answerButtonImage.sprite = _redButtonSprite;
     }
 
     public void SwapSpriteToGreen()
     {
-        _answerButtonImage.sprite = _greenButtonImage;
+        _answerButtonImage.sprite = _greenButtonSprite;
     }
 
     public void SwapSpriteToNormal()
     {
-        _answerButtonImage.sprite = _normalButtonImage;
+        _answerButtonImage.sprite = _normalButtonSprite;
     }
 
     public void SetText(string text)

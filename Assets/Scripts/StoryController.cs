@@ -28,6 +28,7 @@ public class StoryController : MonoBehaviour {
 
     private Image _currentGuy;//Para saber cuál desactivar
     private int _round = 0;
+    private float _timeForReaction = 1;
 
     public struct Answer
     {
@@ -71,6 +72,7 @@ public class StoryController : MonoBehaviour {
 
     public void OnStartButtonPressed()
     {
+        _startButton.SetActive(false);
         _chapterBackground.enabled = true;
         _introBackground.enabled = false;
         _lowerPanel.SetActive(false);
@@ -90,6 +92,7 @@ public class StoryController : MonoBehaviour {
 
     public void OnReactionButtonPressed()
     {
+        if (_round > 4) { return; }
         PopulateCurrentAnswers();
         _currentGuy.enabled = false;
         if (_currentGuy == _guyAngry) { _currentGuy = _guyWaiting; }
@@ -108,10 +111,12 @@ public class StoryController : MonoBehaviour {
     {
         if (_currentAnswer1.isTrusted)
         {
+            _answerButton1.SwapSpriteToGreen();
             CorrectAnswerBehavior(_currentAnswer1.reaction);
         }
         else
         {
+            _answerButton1.SwapSpriteToRed();
             WrongAnswerBehavior(_currentAnswer1.reaction);
         }
     }
@@ -120,10 +125,12 @@ public class StoryController : MonoBehaviour {
     {
         if (_currentAnswer2.isTrusted)
         {
+            _answerButton2.SwapSpriteToGreen();
             CorrectAnswerBehavior(_currentAnswer2.reaction);
         }
         else
         {
+            _answerButton2.SwapSpriteToRed();
             WrongAnswerBehavior(_currentAnswer2.reaction);
         }
     }
@@ -132,21 +139,60 @@ public class StoryController : MonoBehaviour {
     {
         if (_currentAnswer3.isTrusted)
         {
+            _answerButton3.SwapSpriteToGreen();
             CorrectAnswerBehavior(_currentAnswer3.reaction);
         }
         else
         {
+            _answerButton3.SwapSpriteToRed();
             WrongAnswerBehavior(_currentAnswer3.reaction);
         }
     }
 
     void CorrectAnswerBehavior(string reaction)
     {
+        _answerButton1.DisableButton();
+        _answerButton2.DisableButton();
+        _answerButton3.DisableButton();
 
+        _currentGuy.enabled = false;
+        _currentGuy = _guyThinking;
+        _currentGuy.enabled = true;
+        _greenFilter.enabled = true;
+
+        //dar punto verde y comprobar si es el último
+        StartCoroutine(ActivateReaction(reaction));
     }
 
     void WrongAnswerBehavior(string reaction)
     {
+        _answerButton1.DisableButton();
+        _answerButton2.DisableButton();
+        _answerButton3.DisableButton();
+
+        _currentGuy.enabled = false;
+        _currentGuy = _guyAngry;
+        _currentGuy.enabled = true;
+        _redFilter.enabled = true;
+
+        //dar punto rojo y comprobar si es el último antes de llamar a la corutina
+        StartCoroutine(ActivateReaction(reaction));
+    }
+
+    IEnumerator ActivateReaction(string reaction)
+    {
+        yield return new WaitForSeconds(_timeForReaction);
+        _answerButton1.SwapSpriteToNormal();
+        _answerButton2.SwapSpriteToNormal();
+        _answerButton3.SwapSpriteToNormal();
+        _answerButton1.EnableButton();
+        _answerButton2.EnableButton();
+        _answerButton3.EnableButton();
+        _redFilter.enabled = false;
+        _greenFilter.enabled = false;
+        _lowerPanel.SetActive(false);
+        _middlePanel.SetActive(true);
+        _midPanelText.text = reaction;
 
     }
 
