@@ -44,11 +44,13 @@ public class CanvasManager : MonoBehaviour {
         EnableCanvas();
     }
 
-    public void FinishStory()//nombre provisional
+    public void FinishStory()
     {
-        Destroy(_currentCanvas);
+        Canvas auxCanvas = _currentCanvas;
+        DisableCanvas();
         _currentCanvas = _mainMenuCanvas;
         EnableCanvas();
+        Destroy(auxCanvas.gameObject);
     }
 
     private void DisableCanvas()

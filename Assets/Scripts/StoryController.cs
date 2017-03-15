@@ -25,10 +25,15 @@ public class StoryController : MonoBehaviour {
     public AnswerButtonScript _answerButton1;
     public AnswerButtonScript _answerButton2;
     public AnswerButtonScript _answerButton3;
+    public GameObject _liarVerdict;
+    public GameObject _trustedVerdict;
+    public Text _outroText;
+    public GameObject _finishButton;
 
     private Image _currentGuy;//Para saber cuál desactivar
     private int _round = 0;
     private float _timeForReaction = 1;
+    private GaugeManager _gaugeManager;
 
     public struct Answer
     {
@@ -52,6 +57,9 @@ public class StoryController : MonoBehaviour {
 
     void Awake()//En vez de hacerlo manualmente habría que pasar por el parser del txt correspondiente al idioma
     {
+        _gaugeManager = _gauge.GetComponent<GaugeManager>();
+        if (!_gaugeManager) { Debug.LogWarning("Couldn't find gauge manager!"); }
+
         _title = "LA RATA";
         _introSentence.Add("Un día más el chef no hace más que gritarte por no dejar los platos relucientes. Para darle su merecido decides meter un ratón en la olla de su plato estrella.");
         _firstReaction.Add("¿¡Qué le has hecho a mi sopa!?");
@@ -87,7 +95,7 @@ public class StoryController : MonoBehaviour {
 
     public void OnFinishButtonPressed()
     {
-        //Comprobar si se ha ganado y desbloquear pantalla en caso afirmativo, pasar referencia a CanvasManager de este objeto para que lo pueda destruir
+        FindObjectOfType<CanvasManager>().FinishStory();
     }
 
     public void OnReactionButtonPressed()
@@ -160,8 +168,14 @@ public class StoryController : MonoBehaviour {
         _currentGuy.enabled = true;
         _greenFilter.enabled = true;
 
-        //dar punto verde y comprobar si es el último
-        StartCoroutine(ActivateReaction(reaction));
+        if (_gaugeManager.AddGreenBarAndContinue())
+        {
+            StartCoroutine(ActivateReaction(reaction));
+        }
+        else
+        {
+            StartCoroutine(WinOutro());
+        }
     }
 
     void WrongAnswerBehavior(string reaction)
@@ -175,8 +189,14 @@ public class StoryController : MonoBehaviour {
         _currentGuy.enabled = true;
         _redFilter.enabled = true;
 
-        //dar punto rojo y comprobar si es el último antes de llamar a la corutina
-        StartCoroutine(ActivateReaction(reaction));
+        if (_gaugeManager.AddRedBarAndContinue())
+        {
+            StartCoroutine(ActivateReaction(reaction));
+        }
+        else
+        {
+            StartCoroutine(LoseOutro());
+        }
     }
 
     IEnumerator ActivateReaction(string reaction)
@@ -194,6 +214,34 @@ public class StoryController : MonoBehaviour {
         _middlePanel.SetActive(true);
         _midPanelText.text = reaction;
 
+    }
+
+    IEnumerator WinOutro()
+    {
+        yield return new WaitForSeconds(_timeForReaction);
+        _trustedVerdict.SetActive(true);
+        _outroBackground.enabled = true;
+        _chapterBackground.enabled = false;
+        _currentGuy.enabled = false;
+        _answerOptions.SetActive(false);
+        _outroText.text = _outroSentenceGood[0];
+        _outroText.enabled = true;
+        _finishButton.SetActive(true);
+
+        //TODO desbloquear pantalla y guardar partida
+    }
+
+    IEnumerator LoseOutro()
+    {
+        yield return new WaitForSeconds(_timeForReaction);
+        _liarVerdict.SetActive(true);
+        _outroBackground.enabled = true;
+        _chapterBackground.enabled = false;
+        _currentGuy.enabled = false;
+        _answerOptions.SetActive(false);
+        _outroText.text = _outroSentenceBad[0];
+        _outroText.enabled = true;
+        _finishButton.SetActive(true);
     }
 
     void PopulateCurrentAnswers()
