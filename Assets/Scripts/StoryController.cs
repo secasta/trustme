@@ -51,7 +51,7 @@ public class StoryController : MonoBehaviour {
     private List<string> _outroSentenceBad = new List<string>();
     //
 
-    private Answer _currentAnswer1;//variables intermedias
+    private Answer _currentAnswer1;
     private Answer _currentAnswer2;
     private Answer _currentAnswer3;
 
@@ -66,6 +66,7 @@ public class StoryController : MonoBehaviour {
         PopulateAnswersStructs();
         _outroSentenceGood.Add("Siento haber dudado de ti. Has demostrado ser un trabajador fiel. Te has ganado un ascenso.");
         _outroSentenceBad.Add("Parece ser que en mi cocina había dos ratas.");
+        _outroSentenceBad.Add("¡Largo de aquí! La próxima vez que vuelvas a asomar la cabeza por aquí será para probar nuestra sopa de rata.");
     }
 
     void Start ()
@@ -73,7 +74,7 @@ public class StoryController : MonoBehaviour {
         _introBackground.enabled = true;
         _chapterTitle.text = _title;
         _chapterTitle.enabled = true;
-        _chapterIntroText.text = _introSentence[0];
+        _chapterIntroText.text = PickOneRandom(_introSentence);
         _chapterIntroText.enabled = true;
         _startButton.SetActive(true);
 	}
@@ -90,7 +91,7 @@ public class StoryController : MonoBehaviour {
         _guyAngry.enabled = true;
         _currentGuy = _guyAngry;
         _chapterIntroText.enabled = false;
-        _midPanelText.text = _firstReaction[0];//Se tendría que escoger aleatoriamente si se quiere hacer general 
+        _midPanelText.text = PickOneRandom(_firstReaction); 
     }
 
     public void OnFinishButtonPressed()
@@ -224,7 +225,7 @@ public class StoryController : MonoBehaviour {
         _chapterBackground.enabled = false;
         _currentGuy.enabled = false;
         _answerOptions.SetActive(false);
-        _outroText.text = _outroSentenceGood[0];
+        _outroText.text = PickOneRandom(_outroSentenceGood);
         _outroText.enabled = true;
         _finishButton.SetActive(true);
 
@@ -239,18 +240,30 @@ public class StoryController : MonoBehaviour {
         _chapterBackground.enabled = false;
         _currentGuy.enabled = false;
         _answerOptions.SetActive(false);
-        _outroText.text = _outroSentenceBad[0];
+        _outroText.text = PickOneRandom(_outroSentenceBad);
         _outroText.enabled = true;
         _finishButton.SetActive(true);
     }
 
     void PopulateCurrentAnswers()
     {
-        //TODO Hacer aleatorio
-        _currentAnswer1 = _answers[_round, 0];
-        _currentAnswer2 = _answers[_round, 1];
-        _currentAnswer3 = _answers[_round, 2];
+        int firstIndex = Random.Range(0, 3);
+        int secondIndex = firstIndex;
+        int thirdIndex = firstIndex;
+        while (secondIndex == firstIndex) { secondIndex = Random.Range(0, 3); }
+        while (thirdIndex == firstIndex || thirdIndex == secondIndex) { thirdIndex = Random.Range(0, 3); }
+
+        _currentAnswer1 = _answers[_round, firstIndex];
+        _currentAnswer2 = _answers[_round, secondIndex];
+        _currentAnswer3 = _answers[_round, thirdIndex];
         _round++;
+    }
+
+    string PickOneRandom(List<string> list)
+    {
+        int numElements = list.Count;
+        int randomIndex = Random.Range(0, numElements);
+        return list[randomIndex];
     }
 
     void PopulateAnswersStructs()
