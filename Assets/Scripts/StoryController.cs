@@ -7,7 +7,8 @@ public class StoryController : MonoBehaviour {
 
     public Image _introBackground;
     public Image _chapterBackground;
-    public Image _outroBackground;
+    public Image _winOutroBackground;
+    public Image[] _loseOutroBackgrounds;
     public Text _chapterTitle;
     public Text _chapterIntroText;
     public GameObject _startButton;
@@ -74,7 +75,7 @@ public class StoryController : MonoBehaviour {
         _introBackground.enabled = true;
         _chapterTitle.text = _title;
         _chapterTitle.enabled = true;
-        _chapterIntroText.text = PickOneRandom(_introSentence);
+        _chapterIntroText.text = PickOneRandomString(_introSentence);
         _chapterIntroText.enabled = true;
         _startButton.SetActive(true);
 	}
@@ -91,7 +92,7 @@ public class StoryController : MonoBehaviour {
         _guyAngry.enabled = true;
         _currentGuy = _guyAngry;
         _chapterIntroText.enabled = false;
-        _midPanelText.text = PickOneRandom(_firstReaction); 
+        _midPanelText.text = PickOneRandomString(_firstReaction); 
     }
 
     public void OnFinishButtonPressed()
@@ -221,11 +222,11 @@ public class StoryController : MonoBehaviour {
     {
         yield return new WaitForSeconds(_timeForReaction);
         _trustedVerdict.SetActive(true);
-        _outroBackground.enabled = true;
+        _winOutroBackground.enabled = true;
         _chapterBackground.enabled = false;
         _currentGuy.enabled = false;
         _answerOptions.SetActive(false);
-        _outroText.text = PickOneRandom(_outroSentenceGood);
+        _outroText.text = PickOneRandomString(_outroSentenceGood);
         _outroText.enabled = true;
         _finishButton.SetActive(true);
 
@@ -236,11 +237,11 @@ public class StoryController : MonoBehaviour {
     {
         yield return new WaitForSeconds(_timeForReaction);
         _liarVerdict.SetActive(true);
-        _outroBackground.enabled = true;
+        PickOneRandomImage(_loseOutroBackgrounds).enabled = true;
         _chapterBackground.enabled = false;
         _currentGuy.enabled = false;
         _answerOptions.SetActive(false);
-        _outroText.text = PickOneRandom(_outroSentenceBad);
+        _outroText.text = PickOneRandomString(_outroSentenceBad);
         _outroText.enabled = true;
         _finishButton.SetActive(true);
     }
@@ -259,11 +260,18 @@ public class StoryController : MonoBehaviour {
         _round++;
     }
 
-    string PickOneRandom(List<string> list)
+    string PickOneRandomString(List<string> list)
     {
         int numElements = list.Count;
         int randomIndex = Random.Range(0, numElements);
         return list[randomIndex];
+    }
+
+    Image PickOneRandomImage(Image[] images)
+    {
+        int numElements = images.Length;
+        int randomIndex = Random.Range(0, numElements);
+        return images[randomIndex];
     }
 
     void PopulateAnswersStructs()
