@@ -32,14 +32,21 @@ public class AnswerButtonScript : MonoBehaviour {
         _answerButton.enabled = true;
     }
 
-    public void SwapSpriteToRed()
+    public IEnumerator SwapSpriteToRed(float time)
     {
+        yield return new WaitForSeconds(time);
         _answerButtonImage.sprite = _redButtonSprite;
     }
 
-    public void SwapSpriteToGreen()
+    public IEnumerator SwapSpriteToGreen(float time)
     {
+        yield return new WaitForSeconds(time);
         _answerButtonImage.sprite = _greenButtonSprite;
+    }
+
+    public void SwapSpriteToPressed()
+    {
+        _answerButtonImage.sprite = _pressedButtonSprite;
     }
 
     public void SwapSpriteToNormal()

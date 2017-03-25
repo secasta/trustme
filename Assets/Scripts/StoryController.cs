@@ -33,6 +33,7 @@ public class StoryController : MonoBehaviour {
 
     private Image _currentGuy;//Para saber cuál desactivar
     private float _timeForReaction = 1.1f;
+    private float _timeUntilCheckResponse = 0.8f;
     private GaugeManager _gaugeManager;
     private TextParser _parser;
 
@@ -98,51 +99,56 @@ public class StoryController : MonoBehaviour {
 
     public void OnFirstResponsePressed()
     {
+        _answerButton1.SwapSpriteToPressed();
         if (_parser.GetCurrentTrustBoolean(1))
         {
-            _answerButton1.SwapSpriteToGreen();//Dar un tiempo antes de mostrar si se ha acertado o no
-            CorrectAnswerBehavior(_parser.GetCurrentReaction(1));
+            StartCoroutine(_answerButton1.SwapSpriteToGreen(_timeUntilCheckResponse));
+            StartCoroutine(CorrectAnswerBehavior(_parser.GetCurrentReaction(1)));
         }
         else
         {
-            _answerButton1.SwapSpriteToRed();
-            WrongAnswerBehavior(_parser.GetCurrentReaction(1));
+            StartCoroutine(_answerButton1.SwapSpriteToRed(_timeUntilCheckResponse));
+            StartCoroutine(WrongAnswerBehavior(_parser.GetCurrentReaction(1)));
         }
     }
 
     public void OnSecondResponsePressed()
     {
+        _answerButton2.SwapSpriteToPressed();
         if (_parser.GetCurrentTrustBoolean(2))
         {
-            _answerButton2.SwapSpriteToGreen();
-            CorrectAnswerBehavior(_parser.GetCurrentReaction(2));
+            StartCoroutine(_answerButton2.SwapSpriteToGreen(_timeUntilCheckResponse));
+            StartCoroutine(CorrectAnswerBehavior(_parser.GetCurrentReaction(2)));
         }
         else
         {
-            _answerButton2.SwapSpriteToRed();
-            WrongAnswerBehavior(_parser.GetCurrentReaction(2));
+            StartCoroutine(_answerButton2.SwapSpriteToRed(_timeUntilCheckResponse));
+            StartCoroutine(WrongAnswerBehavior(_parser.GetCurrentReaction(2)));
         }
     }
 
     public void OnThirdResponsePressed()
     {
+        _answerButton3.SwapSpriteToPressed();
         if (_parser.GetCurrentTrustBoolean(3))
         {
-            _answerButton3.SwapSpriteToGreen();
-            CorrectAnswerBehavior(_parser.GetCurrentReaction(3));
+            StartCoroutine(_answerButton3.SwapSpriteToGreen(_timeUntilCheckResponse));
+            StartCoroutine(CorrectAnswerBehavior(_parser.GetCurrentReaction(3)));
         }
         else
         {
-            _answerButton3.SwapSpriteToRed();
-            WrongAnswerBehavior(_parser.GetCurrentReaction(3));
+            StartCoroutine(_answerButton3.SwapSpriteToRed(_timeUntilCheckResponse));
+            StartCoroutine(WrongAnswerBehavior(_parser.GetCurrentReaction(3)));
         }
     }
 
-    void CorrectAnswerBehavior(string reaction)
+    IEnumerator CorrectAnswerBehavior(string reaction)
     {
         _answerButton1.DisableButton();
         _answerButton2.DisableButton();
         _answerButton3.DisableButton();
+
+        yield return new WaitForSeconds(_timeUntilCheckResponse);
 
         _currentGuy.enabled = false;
         _currentGuy = _guyThinking;
@@ -159,11 +165,13 @@ public class StoryController : MonoBehaviour {
         }
     }
 
-    void WrongAnswerBehavior(string reaction)
+    IEnumerator WrongAnswerBehavior(string reaction)
     {
         _answerButton1.DisableButton();
         _answerButton2.DisableButton();
         _answerButton3.DisableButton();
+
+        yield return new WaitForSeconds(_timeUntilCheckResponse);
 
         _currentGuy.enabled = false;
         _currentGuy = _guyAngry;
