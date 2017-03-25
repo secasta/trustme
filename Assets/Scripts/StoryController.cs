@@ -100,7 +100,7 @@ public class StoryController : MonoBehaviour {
     {
         if (_parser.GetCurrentTrustBoolean(1))
         {
-            _answerButton1.SwapSpriteToGreen();
+            _answerButton1.SwapSpriteToGreen();//Dar un tiempo antes de mostrar si se ha acertado o no
             CorrectAnswerBehavior(_parser.GetCurrentReaction(1));
         }
         else
