@@ -32,7 +32,7 @@ public class StoryController : MonoBehaviour {
     public GameObject _finishButton;
 
     private Image _currentGuy;//Para saber cuál desactivar
-    private float _timeForReaction = 1;
+    private float _timeForReaction = 1.1f;
     private GaugeManager _gaugeManager;
     private TextParser _parser;
 
@@ -64,8 +64,8 @@ public class StoryController : MonoBehaviour {
         _middlePanel.SetActive(true);
         _chapterTitle.enabled = false;
         _gauge.SetActive(true);
-        _guyAngry.enabled = true;
-        _currentGuy = _guyAngry;
+        _guyWaiting.enabled = true;
+        _currentGuy = _guyWaiting;
         _chapterIntroText.enabled = false;
         _midPanelText.text = _parser.GetFirstReaction(); 
     }
@@ -87,10 +87,6 @@ public class StoryController : MonoBehaviour {
     {
         if (_parser.GetRound() > 4) { return; }
         _parser.PopulateCurrentAnswers();
-        _currentGuy.enabled = false;
-        if (_currentGuy == _guyAngry) { _currentGuy = _guyWaiting; }
-        if (_currentGuy == _guyThinking) { _currentGuy = _guyIdle; }
-        _currentGuy.enabled = true;
         _middlePanel.SetActive(false);
         _lowerPanel.SetActive(true);
         _answerOptions.SetActive(true);
@@ -198,6 +194,10 @@ public class StoryController : MonoBehaviour {
         _lowerPanel.SetActive(false);
         _middlePanel.SetActive(true);
         _midPanelText.text = reaction;
+        _currentGuy.enabled = false;
+        if (_currentGuy == _guyAngry) { _currentGuy = _guyWaiting; }
+        if (_currentGuy == _guyThinking) { _currentGuy = _guyIdle; }
+        _currentGuy.enabled = true;
     }
 
     IEnumerator WinOutro()
