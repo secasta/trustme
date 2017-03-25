@@ -32,50 +32,25 @@ public class StoryController : MonoBehaviour {
     public GameObject _finishButton;
 
     private Image _currentGuy;//Para saber cuál desactivar
-    private int _round = 0;
     private float _timeForReaction = 1;
     private GaugeManager _gaugeManager;
+    private TextParser _parser;
 
-    public struct Answer
-    {
-        public string answer;
-        public bool isTrusted;
-        public string reaction;
-    }
-
-    //Pedir a un parser las frases
-    private string _title;
-    private List<string> _introSentence = new List<string>();//hacemos listas en caso de que haya más de una opción que se elija de forma aleatoria
-    private List<string> _firstReaction = new List<string>();
-    private Answer[,] _answers = new Answer[5,3];//5 rondas de 3, para desordenarlas en cada ronda que pasen por una variable intermedia
-    private List<string> _outroSentenceGood = new List<string>();
-    private List<string> _outroSentenceBad = new List<string>();
-    //
-
-    private Answer _currentAnswer1;
-    private Answer _currentAnswer2;
-    private Answer _currentAnswer3;
 
     void Awake()//En vez de hacerlo manualmente habría que pasar por el parser del txt correspondiente al idioma
     {
+        _parser = GetComponent<TextParser>();
+        if (!_parser) { Debug.LogWarning("Couldn't find text parser!"); }
         _gaugeManager = _gauge.GetComponent<GaugeManager>();
         if (!_gaugeManager) { Debug.LogWarning("Couldn't find gauge manager!"); }
-
-        _title = "LA RATA";
-        _introSentence.Add("Un día más el chef no hace más que gritarte por no dejar los platos relucientes. Para darle su merecido decides meter un ratón en la olla de su plato estrella.");
-        _firstReaction.Add("¿¡Qué le has hecho a mi sopa!?");
-        PopulateAnswersStructs();
-        _outroSentenceGood.Add("Siento haber dudado de ti. Has demostrado ser un trabajador fiel. Te has ganado un ascenso.");
-        _outroSentenceBad.Add("Parece ser que en mi cocina había dos ratas.");
-        _outroSentenceBad.Add("¡Largo de aquí! La próxima vez que vuelvas a asomar la cabeza por aquí será para probar nuestra sopa de rata.");
     }
 
     void Start ()
     {
         _introBackground.enabled = true;
-        _chapterTitle.text = _title;
+        _chapterTitle.text = _parser.GetTitle();
         _chapterTitle.enabled = true;
-        _chapterIntroText.text = PickOneRandomString(_introSentence);
+        _chapterIntroText.text = _parser.GetIntroSentence();
         _chapterIntroText.enabled = true;
         _startButton.SetActive(true);
 	}
@@ -92,18 +67,26 @@ public class StoryController : MonoBehaviour {
         _guyAngry.enabled = true;
         _currentGuy = _guyAngry;
         _chapterIntroText.enabled = false;
-        _midPanelText.text = PickOneRandomString(_firstReaction); 
+        _midPanelText.text = _parser.GetFirstReaction(); 
     }
 
     public void OnFinishButtonPressed()
     {
-        FindObjectOfType<CanvasManager>().FinishStory();
+        CanvasManager canvasManager = FindObjectOfType<CanvasManager>();
+        if (!canvasManager)
+        {
+            Debug.LogError("No Canvas Manager found!");
+        }
+        else
+        {
+            canvasManager.FinishStory();
+        }
     }
 
     public void OnReactionButtonPressed()
     {
-        if (_round > 4) { return; }
-        PopulateCurrentAnswers();
+        if (_parser.GetRound() > 4) { return; }
+        _parser.PopulateCurrentAnswers();
         _currentGuy.enabled = false;
         if (_currentGuy == _guyAngry) { _currentGuy = _guyWaiting; }
         if (_currentGuy == _guyThinking) { _currentGuy = _guyIdle; }
@@ -111,51 +94,51 @@ public class StoryController : MonoBehaviour {
         _middlePanel.SetActive(false);
         _lowerPanel.SetActive(true);
         _answerOptions.SetActive(true);
-        _answerButton1.SetText(_currentAnswer1.answer);
-        _answerButton2.SetText(_currentAnswer2.answer);
-        _answerButton3.SetText(_currentAnswer3.answer);
+        _answerButton1.SetText(_parser.GetCurrentAnswer(1));
+        _answerButton2.SetText(_parser.GetCurrentAnswer(2));
+        _answerButton3.SetText(_parser.GetCurrentAnswer(3));
 
     }
 
     public void OnFirstResponsePressed()
     {
-        if (_currentAnswer1.isTrusted)
+        if (_parser.GetCurrentTrustBoolean(1))
         {
             _answerButton1.SwapSpriteToGreen();
-            CorrectAnswerBehavior(_currentAnswer1.reaction);
+            CorrectAnswerBehavior(_parser.GetCurrentReaction(1));
         }
         else
         {
             _answerButton1.SwapSpriteToRed();
-            WrongAnswerBehavior(_currentAnswer1.reaction);
+            WrongAnswerBehavior(_parser.GetCurrentReaction(1));
         }
     }
 
     public void OnSecondResponsePressed()
     {
-        if (_currentAnswer2.isTrusted)
+        if (_parser.GetCurrentTrustBoolean(2))
         {
             _answerButton2.SwapSpriteToGreen();
-            CorrectAnswerBehavior(_currentAnswer2.reaction);
+            CorrectAnswerBehavior(_parser.GetCurrentReaction(2));
         }
         else
         {
             _answerButton2.SwapSpriteToRed();
-            WrongAnswerBehavior(_currentAnswer2.reaction);
+            WrongAnswerBehavior(_parser.GetCurrentReaction(2));
         }
     }
 
     public void OnThirdResponsePressed()
     {
-        if (_currentAnswer3.isTrusted)
+        if (_parser.GetCurrentTrustBoolean(3))
         {
             _answerButton3.SwapSpriteToGreen();
-            CorrectAnswerBehavior(_currentAnswer3.reaction);
+            CorrectAnswerBehavior(_parser.GetCurrentReaction(3));
         }
         else
         {
             _answerButton3.SwapSpriteToRed();
-            WrongAnswerBehavior(_currentAnswer3.reaction);
+            WrongAnswerBehavior(_parser.GetCurrentReaction(3));
         }
     }
 
@@ -215,7 +198,6 @@ public class StoryController : MonoBehaviour {
         _lowerPanel.SetActive(false);
         _middlePanel.SetActive(true);
         _midPanelText.text = reaction;
-
     }
 
     IEnumerator WinOutro()
@@ -226,7 +208,7 @@ public class StoryController : MonoBehaviour {
         _chapterBackground.enabled = false;
         _currentGuy.enabled = false;
         _answerOptions.SetActive(false);
-        _outroText.text = PickOneRandomString(_outroSentenceGood);
+        _outroText.text = _parser.GetOutroSentenceGood();
         _outroText.enabled = true;
         _finishButton.SetActive(true);
 
@@ -241,30 +223,9 @@ public class StoryController : MonoBehaviour {
         _chapterBackground.enabled = false;
         _currentGuy.enabled = false;
         _answerOptions.SetActive(false);
-        _outroText.text = PickOneRandomString(_outroSentenceBad);
+        _outroText.text = _parser.GetOutroSentenceBad();
         _outroText.enabled = true;
         _finishButton.SetActive(true);
-    }
-
-    void PopulateCurrentAnswers()
-    {
-        int firstIndex = Random.Range(0, 3);
-        int secondIndex = firstIndex;
-        int thirdIndex = firstIndex;
-        while (secondIndex == firstIndex) { secondIndex = Random.Range(0, 3); }
-        while (thirdIndex == firstIndex || thirdIndex == secondIndex) { thirdIndex = Random.Range(0, 3); }
-
-        _currentAnswer1 = _answers[_round, firstIndex];
-        _currentAnswer2 = _answers[_round, secondIndex];
-        _currentAnswer3 = _answers[_round, thirdIndex];
-        _round++;
-    }
-
-    string PickOneRandomString(List<string> list)
-    {
-        int numElements = list.Count;
-        int randomIndex = Random.Range(0, numElements);
-        return list[randomIndex];
     }
 
     Image PickOneRandomImage(Image[] images)
@@ -272,73 +233,5 @@ public class StoryController : MonoBehaviour {
         int numElements = images.Length;
         int randomIndex = Random.Range(0, numElements);
         return images[randomIndex];
-    }
-
-    void PopulateAnswersStructs()
-    {
-        //Tocho para poblar todos los structs, cuando todas las transiciones funcionen guay habrá que hacer esto bien
-        _answers[0, 0].answer = "¡Yo no he sido!";
-        _answers[0, 0].isTrusted = true;
-        _answers[0, 0].reaction = "Mmmm... Pues hay testigos que aseguran haberte visto merodeando por aquí.";
-
-        _answers[0, 1].answer = "He visto a Norman merodeando por la zona.";
-        _answers[0, 1].isTrusted = false;
-        _answers[0, 1].reaction = "Pero si Norman hoy no trabaja. Además, hay testigos que aseguran haberte visto merodeando por aquí.";
-
-        _answers[0, 2].answer = "¡Has sido tú!";
-        _answers[0, 2].isTrusted = false;
-        _answers[0, 2].reaction = "¿¡Cómo quieres que estropee mi propia receta!? Además, hay testigos que aseguran haberte visto merodeando por aquí.";
-
-
-        _answers[1, 0].answer = "¿Quién te lo ha dicho?";
-        _answers[1, 0].isTrusted = true;
-        _answers[1, 0].reaction = "Jaime, pero es cierto que es bastante despistado. ¡No me confundas! Por tu culpa sanidad nos va a cerrar el restaurante.";
-
-        _answers[1, 1].answer = "Mi cara es muy común. Alguien se habrá confundido.";
-        _answers[1, 1].isTrusted = false;
-        _answers[1, 1].reaction = "Eres el más alto de la cocina. Es fácil reconocerte... Por tu culpa sanidad nos va a cerrar el restaurante.";
-
-        _answers[1, 2].answer = "¡No era yo! Ha sido mi hermano gemelo.";
-        _answers[1, 2].isTrusted = false;
-        _answers[1, 2].reaction = "¿Me tomas por tonto? Por tu culpa sanidad nos va a cerrar el restaurante.";
-
-
-        _answers[2, 0].answer = "¡Ha sido Jaime!";
-        _answers[2, 0].isTrusted = true;
-        _answers[2, 0].reaction = "¿Tienes pruebas? Creo que sólo quieres escaquearte... ¡Confiesa!";
-
-        _answers[2, 1].answer = "¿Por qué no hacemos como si no hubiera pasado nada?";
-        _answers[2, 1].isTrusted = false;
-        _answers[2, 1].reaction = "No te vas a escapar tan fácilmente de ésta. ¡Confiesa!";
-
-        _answers[2, 2].answer = "Sanidad no tiene por qué enterarse.";
-        _answers[2, 2].isTrusted = false;
-        _answers[2, 2].reaction = "Pero yo sí que me he enterado. ¡Confiesa!";
-
-
-        _answers[3, 0].answer = "Jaime te tiene envidia. Siempre ha querido tu puesto.";
-        _answers[3, 0].isTrusted = true;
-        _answers[3, 0].reaction = "¿Cómo sabes tú eso? Quiero saber la verdad.";
-
-        _answers[3, 1].answer = "Quizá ha sido un accidente.";
-        _answers[3, 1].isTrusted = false;
-        _answers[3, 1].reaction = "El accidente fue contratarte... Quiero saber la verdad.";
-
-        _answers[3, 2].answer = "Tienes enemigos en esta cocina.";
-        _answers[3, 2].isTrusted = false;
-        _answers[3, 2].reaction = "Y tú parece que eres uno de ellos. Quiero saber la verdad.";
-
-
-        _answers[4, 0].answer = "Me dijo que estaba cansado de tus gritos. ¡Yo no haría algo así!";
-        _answers[4, 0].isTrusted = true;
-        _answers[4, 0].reaction = "Este mensaje no debería estar apareciendo en pantalla. ¡Ups!";
-
-        _answers[4, 1].answer = "De todos modos, tu receta apesta.";
-        _answers[4, 1].isTrusted = false;
-        _answers[4, 1].reaction = "Este mensaje no debería estar apareciendo en pantalla. ¡Ups!";
-
-        _answers[4, 2].answer = "Creo que te precipitas asumiendo que he sido yo.";
-        _answers[4, 2].isTrusted = false;
-        _answers[4, 2].reaction = "Este mensaje no debería estar apareciendo en pantalla. ¡Ups!";
-    }
+    }   
 }
