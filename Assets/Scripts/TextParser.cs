@@ -204,7 +204,6 @@ public class TextParser : MonoBehaviour {
         if (word.Contains("true"))
         {
             _answers[roundIndex, positionIndex].isTrusted = true;
-            Debug.Log("BOOLEAN=" + word + "/");
         }
         else if(word.Contains("false"))
         {

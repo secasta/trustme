@@ -16,6 +16,7 @@ public class StoryController : MonoBehaviour {
     public GameObject _lowerPanel;
     public GameObject _gauge;
     public Text _midPanelText;
+    public Button _midPanelButton;
     public Image _guyIdle;
     public Image _guyWaiting;
     public Image _guyThinking;
@@ -34,8 +35,12 @@ public class StoryController : MonoBehaviour {
     private Image _currentGuy;//Para saber cuál desactivar
     private float _timeForReaction = 1.1f;
     private float _timeUntilCheckResponse = 0.8f;
+    private float _deadTimeBetweenTransitions = 0.4f;
     private GaugeManager _gaugeManager;
     private TextParser _parser;
+    private CanvasManager _canvasManager;
+    private bool _isLevelBeaten = false;
+    
 
 
     void Awake()//En vez de hacerlo manualmente habría que pasar por el parser del txt correspondiente al idioma
@@ -44,6 +49,8 @@ public class StoryController : MonoBehaviour {
         if (!_parser) { Debug.LogWarning("Couldn't find text parser!"); }
         _gaugeManager = _gauge.GetComponent<GaugeManager>();
         if (!_gaugeManager) { Debug.LogWarning("Couldn't find gauge manager!"); }
+        _canvasManager = FindObjectOfType<CanvasManager>();
+        if (!_canvasManager){ Debug.LogError("No Canvas Manager found!");}
     }
 
     void Start ()
@@ -58,6 +65,8 @@ public class StoryController : MonoBehaviour {
 
     public void OnStartButtonPressed()
     {
+        _midPanelButton.enabled = false;
+        StartCoroutine(EnableMidPanelButton());
         _startButton.SetActive(false);
         _chapterBackground.enabled = true;
         _introBackground.enabled = false;
@@ -73,15 +82,7 @@ public class StoryController : MonoBehaviour {
 
     public void OnFinishButtonPressed()
     {
-        CanvasManager canvasManager = FindObjectOfType<CanvasManager>();
-        if (!canvasManager)
-        {
-            Debug.LogError("No Canvas Manager found!");
-        }
-        else
-        {
-            canvasManager.FinishStory();
-        }
+        _canvasManager.FinishStory(_isLevelBeaten);
     }
 
     public void OnReactionButtonPressed()
@@ -94,6 +95,7 @@ public class StoryController : MonoBehaviour {
         _answerButton1.SetText(_parser.GetCurrentAnswer(1));
         _answerButton2.SetText(_parser.GetCurrentAnswer(2));
         _answerButton3.SetText(_parser.GetCurrentAnswer(3));
+        StartCoroutine(EnableAnswerButtons());
 
     }
 
@@ -190,13 +192,12 @@ public class StoryController : MonoBehaviour {
 
     IEnumerator ActivateReaction(string reaction)
     {
+        _midPanelButton.enabled = false;
         yield return new WaitForSeconds(_timeForReaction);
+        StartCoroutine(EnableMidPanelButton());
         _answerButton1.SwapSpriteToNormal();
         _answerButton2.SwapSpriteToNormal();
         _answerButton3.SwapSpriteToNormal();
-        _answerButton1.EnableButton();
-        _answerButton2.EnableButton();
-        _answerButton3.EnableButton();
         _redFilter.enabled = false;
         _greenFilter.enabled = false;
         _lowerPanel.SetActive(false);
@@ -208,8 +209,23 @@ public class StoryController : MonoBehaviour {
         _currentGuy.enabled = true;
     }
 
+    IEnumerator EnableAnswerButtons()
+    {
+        yield return new WaitForSeconds(_deadTimeBetweenTransitions);
+        _answerButton1.EnableButton();
+        _answerButton2.EnableButton();
+        _answerButton3.EnableButton();
+    }
+
+    IEnumerator EnableMidPanelButton()
+    {
+        yield return new WaitForSeconds(_deadTimeBetweenTransitions);
+        _midPanelButton.enabled = true;
+    }
+
     IEnumerator WinOutro()
     {
+        _isLevelBeaten = true;
         yield return new WaitForSeconds(_timeForReaction);
         _trustedVerdict.SetActive(true);
         _winOutroBackground.enabled = true;
