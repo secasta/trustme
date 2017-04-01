@@ -40,8 +40,9 @@ public class StoryController : MonoBehaviour {
     private TextParser _parser;
     private CanvasManager _canvasManager;
     private bool _isLevelBeaten = false;
-    
 
+    public delegate void StoryCompleted(int id);
+    public static event StoryCompleted OnStoryCompleted;
 
     void Awake()//En vez de hacerlo manualmente habría que pasar por el parser del txt correspondiente al idioma
     {
@@ -236,7 +237,13 @@ public class StoryController : MonoBehaviour {
         _outroText.enabled = true;
         _finishButton.SetActive(true);
 
-        //TODO desbloquear pantalla y guardar partida
+
+        //TODO modificar clase a guardar y guardar partida 
+        if (OnStoryCompleted != null)
+        {
+            OnStoryCompleted(_parser.GetStoryID());
+        }
+        
     }
 
     IEnumerator LoseOutro()

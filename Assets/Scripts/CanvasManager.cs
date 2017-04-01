@@ -16,11 +16,12 @@ public class CanvasManager : MonoBehaviour {
     private Canvas _currentCanvas;
     private List<Canvas> _unbeatenStoryCanvases;
     private List<Sprite> _unbeatenBackgroundSprites;
+    private bool _alreadyBeatenLevel = false;
 
     void Awake()
     {
-        _unbeatenStoryCanvases = _storyCanvases;
-        _unbeatenBackgroundSprites = _backgroundSprites;
+        _unbeatenStoryCanvases = new List<Canvas>(_storyCanvases);
+        _unbeatenBackgroundSprites = new List<Sprite>(_backgroundSprites);//we're not really using _backgroundSprites at all, but just in case
         _currentCanvas = _mainMenuCanvas;
         _backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
         EnableCanvas();
@@ -28,10 +29,17 @@ public class CanvasManager : MonoBehaviour {
 
     public void StartBeatenStory(int storyId)
     {
+        if ((storyId >= 0) && (storyId < _storyCanvases.Count))
+        {
+            _alreadyBeatenLevel = true;
             DisableCanvas();
-            _currentStoryIndex = storyId;
             _currentCanvas = Instantiate(_storyCanvases[storyId]);
             EnableCanvas();
+        }
+        else
+        {
+            Debug.LogError("Story Id out of range. Index " + storyId + " is not on my list!");
+        }
     }
 
     public void NextUnbeatenStory()
@@ -72,6 +80,18 @@ public class CanvasManager : MonoBehaviour {
         _currentCanvas = _mainMenuCanvas;
         EnableCanvas();
         Destroy(auxCanvas.gameObject);
+        if (!_alreadyBeatenLevel)
+        {
+            if (isBeaten)
+            {
+                //TODO Show you've unlocked the story, although the unlocking is done from StoryController
+
+                _unbeatenBackgroundSprites.RemoveAt(_currentStoryIndex);
+                _unbeatenStoryCanvases.RemoveAt(_currentStoryIndex);
+            }
+        }
+        _alreadyBeatenLevel = false;
+        SelectNextStory();
     }
 
     private void DisableCanvas()
@@ -90,11 +110,13 @@ public class CanvasManager : MonoBehaviour {
         {
             int rand = Random.Range(0, _unbeatenStoryCanvases.Count - 1);
             _currentStoryIndex = rand;
+            _backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
         }
         else
         {
-            //Quitar los botones de la vista
+            //TODO Quitar los botones de la vista
             _backgroundImage.sprite = null;
+            _backgroundImage.enabled = false;
         }
     }
 

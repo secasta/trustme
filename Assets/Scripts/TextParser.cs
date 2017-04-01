@@ -32,6 +32,12 @@ public class TextParser : MonoBehaviour {
         ParseFile();
 	}
 
+    public int GetStoryID()
+    {
+        int id = int.Parse(rawTextFile.name.Substring(0, 3));
+        return id;
+    }
+
     public int GetRound()
     {
         return _round;
