@@ -23,7 +23,7 @@ public class CanvasManager : MonoBehaviour {
         _unbeatenStoryCanvases = new List<Canvas>(_storyCanvases);
         _unbeatenBackgroundSprites = new List<Sprite>(_backgroundSprites);//we're not really using _backgroundSprites at all, but just in case
         _currentCanvas = _mainMenuCanvas;
-        SelectNextStory();
+        //SelectNextStory();
         _backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
         EnableCanvas();
     }
@@ -48,7 +48,7 @@ public class CanvasManager : MonoBehaviour {
         if (_unbeatenStoryCanvases.Count > 0)
         {
             DisableCanvas();
-            _currentCanvas = Instantiate(_storyCanvases[_currentStoryIndex]);
+            _currentCanvas = Instantiate(_unbeatenStoryCanvases[_currentStoryIndex]);
             EnableCanvas();
         }
     }
@@ -86,10 +86,11 @@ public class CanvasManager : MonoBehaviour {
             if (isBeaten)
             {
                 //TODO Show you've unlocked the story, although the unlocking is done from StoryController
-                
+                Debug.Log("index: " + _currentStoryIndex + ", unbeaten canvases: " + _unbeatenStoryCanvases.Count + ", unbeaten canvases: " + _unbeatenBackgroundSprites.Count);
                 _unbeatenBackgroundSprites.RemoveAt(_currentStoryIndex);
                 _unbeatenStoryCanvases.RemoveAt(_currentStoryIndex);
                 Debug.Log("Removing story and background from unbeaten stories");
+                Debug.Log("index: " + _currentStoryIndex + ", unbeaten canvases: " + _unbeatenStoryCanvases.Count + ", unbeaten canvases: " + _unbeatenBackgroundSprites.Count);
             }
         }
         _alreadyBeatenLevel = false;
@@ -110,10 +111,12 @@ public class CanvasManager : MonoBehaviour {
     {
         if (_unbeatenStoryCanvases.Count > 0)
         {
+            Debug.Log("index: " + _currentStoryIndex + ", unbeaten canvases: " + _unbeatenStoryCanvases.Count + ", unbeaten canvases: " + _unbeatenBackgroundSprites.Count);
             int rand = Random.Range(0, _unbeatenStoryCanvases.Count);
             _currentStoryIndex = rand;
             _backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
-            Debug.Log("New index");
+            Debug.Log("New random index");
+            Debug.Log("index: " + _currentStoryIndex + ", unbeaten canvases: " + _unbeatenStoryCanvases.Count + ", unbeaten canvases: " + _unbeatenBackgroundSprites.Count);
         }
         else
         {
