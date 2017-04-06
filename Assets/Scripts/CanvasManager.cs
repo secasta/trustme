@@ -23,6 +23,7 @@ public class CanvasManager : MonoBehaviour {
         _unbeatenStoryCanvases = new List<Canvas>(_storyCanvases);
         _unbeatenBackgroundSprites = new List<Sprite>(_backgroundSprites);//we're not really using _backgroundSprites at all, but just in case
         _currentCanvas = _mainMenuCanvas;
+        SelectNextStory();
         _backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
         EnableCanvas();
     }
@@ -108,7 +109,7 @@ public class CanvasManager : MonoBehaviour {
     {
         if (_unbeatenStoryCanvases.Count > 0)
         {
-            int rand = Random.Range(0, _unbeatenStoryCanvases.Count - 1);
+            int rand = Random.Range(0, _unbeatenStoryCanvases.Count);
             _currentStoryIndex = rand;
             _backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
         }
