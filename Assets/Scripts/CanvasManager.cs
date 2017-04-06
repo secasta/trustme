@@ -86,9 +86,10 @@ public class CanvasManager : MonoBehaviour {
             if (isBeaten)
             {
                 //TODO Show you've unlocked the story, although the unlocking is done from StoryController
-
+                
                 _unbeatenBackgroundSprites.RemoveAt(_currentStoryIndex);
                 _unbeatenStoryCanvases.RemoveAt(_currentStoryIndex);
+                Debug.Log("Removing story and background from unbeaten stories");
             }
         }
         _alreadyBeatenLevel = false;
@@ -112,6 +113,7 @@ public class CanvasManager : MonoBehaviour {
             int rand = Random.Range(0, _unbeatenStoryCanvases.Count);
             _currentStoryIndex = rand;
             _backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
+            Debug.Log("New index");
         }
         else
         {

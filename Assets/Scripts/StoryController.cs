@@ -34,7 +34,7 @@ public class StoryController : MonoBehaviour {
 
     private Image _currentGuy;//Para saber cuál desactivar
     private float _timeForReaction = 1.1f;
-    private float _timeUntilCheckResponse = 0.8f;
+    private float _timeUntilCheckResponse = 0.2f;
     private float _deadTimeBetweenTransitions = 0.4f;
     private GaugeManager _gaugeManager;
     private TextParser _parser;
