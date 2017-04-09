@@ -18,12 +18,15 @@ public class CanvasManager : MonoBehaviour {
     private List<Sprite> _unbeatenBackgroundSprites;
     private bool _alreadyBeatenLevel = false;
 
+    public delegate void StoryCompleted(int id);
+    public static event StoryCompleted OnStoryCompleted;
+
     void Awake()
     {
         _unbeatenStoryCanvases = new List<Canvas>(_storyCanvases);
         _unbeatenBackgroundSprites = new List<Sprite>(_backgroundSprites);//we're not really using _backgroundSprites at all, but just in case
         _currentCanvas = _mainMenuCanvas;
-        //SelectNextStory();
+        SelectNextStory();
         _backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
         EnableCanvas();
     }
@@ -74,25 +77,36 @@ public class CanvasManager : MonoBehaviour {
         EnableCanvas();
     }
 
-    public void FinishStory(bool isBeaten)
+    public void FinishStory(bool isBeaten, int finishedStoryId)
     {
         Canvas auxCanvas = _currentCanvas;
         DisableCanvas();
-        _currentCanvas = _mainMenuCanvas;
-        EnableCanvas();
-        Destroy(auxCanvas.gameObject);
+        
         if (!_alreadyBeatenLevel)
         {
             if (isBeaten)
             {
                 //TODO Show you've unlocked the story, although the unlocking is done from StoryController
-                Debug.Log("index: " + _currentStoryIndex + ", unbeaten canvases: " + _unbeatenStoryCanvases.Count + ", unbeaten canvases: " + _unbeatenBackgroundSprites.Count);
                 _unbeatenBackgroundSprites.RemoveAt(_currentStoryIndex);
                 _unbeatenStoryCanvases.RemoveAt(_currentStoryIndex);
-                Debug.Log("Removing story and background from unbeaten stories");
-                Debug.Log("index: " + _currentStoryIndex + ", unbeaten canvases: " + _unbeatenStoryCanvases.Count + ", unbeaten canvases: " + _unbeatenBackgroundSprites.Count);
+                _currentCanvas = _storySelectCanvas;
+                if (OnStoryCompleted != null)
+                {
+                    OnStoryCompleted(finishedStoryId);
+                }
+            }
+            else
+            {
+                _currentCanvas = _mainMenuCanvas;
             }
         }
+        else
+        {
+            _currentCanvas = _mainMenuCanvas;
+            
+        }
+        EnableCanvas();
+        Destroy(auxCanvas.gameObject);
         _alreadyBeatenLevel = false;
         SelectNextStory();
     }
@@ -111,12 +125,9 @@ public class CanvasManager : MonoBehaviour {
     {
         if (_unbeatenStoryCanvases.Count > 0)
         {
-            Debug.Log("index: " + _currentStoryIndex + ", unbeaten canvases: " + _unbeatenStoryCanvases.Count + ", unbeaten canvases: " + _unbeatenBackgroundSprites.Count);
             int rand = Random.Range(0, _unbeatenStoryCanvases.Count);
             _currentStoryIndex = rand;
             _backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
-            Debug.Log("New random index");
-            Debug.Log("index: " + _currentStoryIndex + ", unbeaten canvases: " + _unbeatenStoryCanvases.Count + ", unbeaten canvases: " + _unbeatenBackgroundSprites.Count);
         }
         else
         {

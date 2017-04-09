@@ -41,8 +41,7 @@ public class StoryController : MonoBehaviour {
     private CanvasManager _canvasManager;
     private bool _isLevelBeaten = false;
 
-    public delegate void StoryCompleted(int id);
-    public static event StoryCompleted OnStoryCompleted;
+    
 
     void Awake()//En vez de hacerlo manualmente habría que pasar por el parser del txt correspondiente al idioma
     {
@@ -83,7 +82,8 @@ public class StoryController : MonoBehaviour {
 
     public void OnFinishButtonPressed()
     {
-        _canvasManager.FinishStory(_isLevelBeaten);
+        _canvasManager.FinishStory(_isLevelBeaten, _parser.GetStoryID());
+        
     }
 
     public void OnReactionButtonPressed()
@@ -238,12 +238,7 @@ public class StoryController : MonoBehaviour {
         _finishButton.SetActive(true);
 
 
-        //TODO modificar clase a guardar y guardar partida 
-        if (OnStoryCompleted != null)
-        {
-            OnStoryCompleted(_parser.GetStoryID());
-        }
-        
+        //TODO modificar clase a guardar y guardar partida  
     }
 
     IEnumerator LoseOutro()

@@ -6,11 +6,13 @@ using UnityEngine.UI;
 public class StoryButton : MonoBehaviour {
 
     public Sprite _storyIcon;
+    public GameObject _blockingPanel;
 
     private int _storyId;
     private Button _button;
     private Image _image;
     private CanvasManager _canvasManager;
+    private Animator _animator;
 
 
 	void Awake () {
@@ -20,6 +22,8 @@ public class StoryButton : MonoBehaviour {
         if (!_image) { Debug.LogError("No image component found", this); }
         _canvasManager = FindObjectOfType<CanvasManager>();
         if (!_canvasManager) { Debug.LogError("Canvas Manager not found", this); }
+        _animator = GetComponent<Animator>();
+        if (!_animator) { Debug.LogError("Animator not found", this); }
 
         _storyId = int.Parse(gameObject.name.Substring(0, 3));
 
@@ -28,25 +32,49 @@ public class StoryButton : MonoBehaviour {
 
     void OnEnable()
     {
-        StoryController.OnStoryCompleted += CheckIfButtonShouldBeUnlocked;
+        CanvasManager.OnStoryCompleted += CheckIfButtonShouldBeUnlocked;
     }
 
     void OnDisable()
     {
-        StoryController.OnStoryCompleted -= CheckIfButtonShouldBeUnlocked;
+        CanvasManager.OnStoryCompleted -= CheckIfButtonShouldBeUnlocked;
     }
 
     void CheckIfButtonShouldBeUnlocked(int id)
     {
         if (id == _storyId)
         {
-            _image.sprite = _storyIcon;
-            _button.enabled = true;
+            UnlockButton();
+
         }
     }
 
     public void StartStory()
     {
         _canvasManager.StartBeatenStory(_storyId);
+    }
+
+    private void UnlockButton()
+    {
+        _blockingPanel.SetActive(true);
+        _animator.SetTrigger("Unlock Trigger");
+        _button.enabled = true;
+    }
+
+    public void ChangeSprite()
+    {
+        _image.sprite = _storyIcon;
+    }
+
+    public void AnimationFinished()
+    {
+        StartCoroutine(FinishUnlockingSequence(0.9f));
+    }
+
+    IEnumerator FinishUnlockingSequence(float time)
+    {
+        yield return new WaitForSeconds(time);
+        _canvasManager.GoToMain();
+        _blockingPanel.SetActive(false);
     }
 }
