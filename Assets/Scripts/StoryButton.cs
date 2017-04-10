@@ -13,6 +13,8 @@ public class StoryButton : MonoBehaviour {
     private Image _image;
     private CanvasManager _canvasManager;
     private Animator _animator;
+    private VerticalScrollRect _gridScrollRect;
+    private RectTransform _thisRectTransform;
 
 
 	void Awake () {
@@ -24,6 +26,10 @@ public class StoryButton : MonoBehaviour {
         if (!_canvasManager) { Debug.LogError("Canvas Manager not found", this); }
         _animator = GetComponent<Animator>();
         if (!_animator) { Debug.LogError("Animator not found", this); }
+        _gridScrollRect = GetComponentInParent<VerticalScrollRect>();
+        if (!_gridScrollRect) { Debug.LogError("Scroll rect not found in parent", this); }
+        _thisRectTransform = GetComponentInParent<RectTransform>();
+        if (!_thisRectTransform) { Debug.LogError("Rect transform not found", this); }
 
         _storyId = int.Parse(gameObject.name.Substring(0, 3));
 
@@ -57,6 +63,7 @@ public class StoryButton : MonoBehaviour {
     private void UnlockButton()
     {
         _blockingPanel.SetActive(true);
+        _gridScrollRect.ScrollToShow(_thisRectTransform);
         _animator.SetTrigger("Unlock Trigger");
         _button.enabled = true;
     }
@@ -76,5 +83,6 @@ public class StoryButton : MonoBehaviour {
         yield return new WaitForSeconds(time);
         _canvasManager.GoToMain();
         _blockingPanel.SetActive(false);
+        //_gridScrollRect.ResetPosition();
     }
 }

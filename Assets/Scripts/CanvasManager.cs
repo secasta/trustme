@@ -12,11 +12,15 @@ public class CanvasManager : MonoBehaviour {
     public Canvas _settingsCanvas;
     public Canvas _storySelectCanvas;
 
+    public bool testing = false;
+    
+
     private int _currentStoryIndex = 0;
     private Canvas _currentCanvas;
     private List<Canvas> _unbeatenStoryCanvases;
     private List<Sprite> _unbeatenBackgroundSprites;
     private bool _alreadyBeatenLevel = false;
+    private VerticalScrollRect _storiesScrollRect;
 
     public delegate void StoryCompleted(int id);
     public static event StoryCompleted OnStoryCompleted;
@@ -29,6 +33,9 @@ public class CanvasManager : MonoBehaviour {
         SelectNextStory();
         _backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
         EnableCanvas();
+
+        _storiesScrollRect = _storySelectCanvas.GetComponentInChildren<VerticalScrollRect>();
+        if (!_storiesScrollRect) { Debug.LogError("No scroll rect found on children", this); }
     }
 
     public void StartBeatenStory(int storyId)
@@ -67,6 +74,7 @@ public class CanvasManager : MonoBehaviour {
     {
         DisableCanvas();
         _currentCanvas = _storySelectCanvas;
+        _storiesScrollRect.ResetPosition();
         EnableCanvas();
     }
 

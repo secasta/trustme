@@ -61,6 +61,14 @@ public class StoryController : MonoBehaviour {
         _chapterIntroText.text = _parser.GetIntroSentence();
         _chapterIntroText.enabled = true;
         _startButton.SetActive(true);
+
+        //Remove waiting times when testing
+        if (_canvasManager.testing)
+        {
+            _timeForReaction = 0;
+             _timeUntilCheckResponse = 0;
+            _deadTimeBetweenTransitions = 0;
+        }
 	}
 
     public void OnStartButtonPressed()
