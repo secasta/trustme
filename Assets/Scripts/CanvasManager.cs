@@ -21,6 +21,7 @@ public class CanvasManager : MonoBehaviour {
     private List<Sprite> _unbeatenBackgroundSprites;
     private bool _alreadyBeatenLevel = false;
     private VerticalScrollRect _storiesScrollRect;
+    private Canvas _randomBeatenCanvas;
 
     public delegate void StoryCompleted(int id);
     public static event StoryCompleted OnStoryCompleted;
@@ -45,6 +46,7 @@ public class CanvasManager : MonoBehaviour {
             _alreadyBeatenLevel = true;
             DisableCanvas();
             _currentCanvas = Instantiate(_storyCanvases[storyId]);
+            //TODO Story back button enabled
             EnableCanvas();
         }
         else
@@ -59,6 +61,13 @@ public class CanvasManager : MonoBehaviour {
         {
             DisableCanvas();
             _currentCanvas = Instantiate(_unbeatenStoryCanvases[_currentStoryIndex]);
+            EnableCanvas();
+        }
+        else
+        {
+            _alreadyBeatenLevel = true;
+            DisableCanvas();
+            _currentCanvas = Instantiate(_randomBeatenCanvas);
             EnableCanvas();
         }
     }
@@ -110,6 +119,7 @@ public class CanvasManager : MonoBehaviour {
         }
         else
         {
+            //TODO story back button disabled
             _currentCanvas = _mainMenuCanvas;
             
         }
@@ -140,8 +150,13 @@ public class CanvasManager : MonoBehaviour {
         else
         {
             //TODO Quitar los botones de la vista
-            _backgroundImage.sprite = null;
-            _backgroundImage.enabled = false;
+            //_backgroundImage.sprite = null;
+            //_backgroundImage.enabled = false;
+
+            //De momento, si se acaban las historias damos una aleatoria
+            int rand = Random.Range(0, _storyCanvases.Count);
+            _randomBeatenCanvas = _storyCanvases[rand];
+            _backgroundImage.sprite = _backgroundSprites[rand];
         }
     }
 

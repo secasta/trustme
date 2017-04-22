@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class TextParser : MonoBehaviour {
 
-    public TextAsset rawTextFile;
+    public TextAsset _spanishTextFile;
+    public TextAsset _englishTextFile;
 
     public struct Answer
     {
@@ -13,6 +14,7 @@ public class TextParser : MonoBehaviour {
         public string reaction;
     }
 
+    private TextAsset _fileToParse;
     private string _title;
     private List<string> _introSentence = new List<string>();//hacemos listas en caso de que haya más de una opción que se elija de forma aleatoria
     private List<string> _firstReaction = new List<string>();
@@ -27,14 +29,25 @@ public class TextParser : MonoBehaviour {
     private int _round = 0;
 
 
-    void Awake ()
+    void Awake()
     {
+        switch (CurrentSettings.Language)
+        {
+            case SystemLanguage.Spanish:
+                _fileToParse = _spanishTextFile;
+                break;
+            default:
+                _fileToParse = _englishTextFile;
+                break;
+        }
+        
+    
         ParseFile();
 	}
 
     public int GetStoryID()
     {
-        int id = int.Parse(rawTextFile.name.Substring(0, 3));
+        int id = int.Parse(_fileToParse.name.Substring(0, 3));
         return id;
     }
 
@@ -137,7 +150,7 @@ public class TextParser : MonoBehaviour {
 
     void ParseFile()
     {
-        string[] rawTextLines = rawTextFile.text.Split('\n');
+        string[] rawTextLines = _fileToParse.text.Split('\n');
         foreach (string rawTextLine in rawTextLines)
         {
             ParseLine(rawTextLine);
