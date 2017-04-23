@@ -22,6 +22,7 @@ public class CanvasManager : MonoBehaviour {
     private bool _alreadyBeatenLevel = false;
     private VerticalScrollRect _storiesScrollRect;
     private Canvas _randomBeatenCanvas;
+    private AndroidBackButton _androidBackButton;
 
     public delegate void StoryCompleted(int id);
     public static event StoryCompleted OnStoryCompleted;
@@ -37,6 +38,8 @@ public class CanvasManager : MonoBehaviour {
 
         _storiesScrollRect = _storySelectCanvas.GetComponentInChildren<VerticalScrollRect>();
         if (!_storiesScrollRect) { Debug.LogError("No scroll rect found on children", this); }
+        _androidBackButton = FindObjectOfType<AndroidBackButton>();
+        if (!_androidBackButton) { Debug.LogError("No android back button script found", this); }
     }
 
     public void StartBeatenStory(int storyId)
@@ -48,6 +51,8 @@ public class CanvasManager : MonoBehaviour {
             _currentCanvas = Instantiate(_storyCanvases[storyId]);
             //TODO Story back button enabled
             EnableCanvas();
+
+            _androidBackButton.SetToGoToMainPop();
         }
         else
         {
@@ -62,13 +67,18 @@ public class CanvasManager : MonoBehaviour {
             DisableCanvas();
             _currentCanvas = Instantiate(_unbeatenStoryCanvases[_currentStoryIndex]);
             EnableCanvas();
+
+            _androidBackButton.SetToInactive();
         }
         else
         {
             _alreadyBeatenLevel = true;
             DisableCanvas();
             _currentCanvas = Instantiate(_randomBeatenCanvas);
+            //TODO Story back button enabled
             EnableCanvas();
+
+            _androidBackButton.SetToGoToMainPop();
         }
     }
 
@@ -77,6 +87,7 @@ public class CanvasManager : MonoBehaviour {
         DisableCanvas();
         _currentCanvas = _settingsCanvas;
         EnableCanvas();
+        _androidBackButton.SetToGoToMain();
     }
 
     public void GoToAlbum()
@@ -85,6 +96,7 @@ public class CanvasManager : MonoBehaviour {
         _currentCanvas = _storySelectCanvas;
         _storiesScrollRect.ResetPosition();
         EnableCanvas();
+        _androidBackButton.SetToGoToMain();
     }
 
     public void GoToMain()
@@ -92,6 +104,7 @@ public class CanvasManager : MonoBehaviour {
         DisableCanvas();
         _currentCanvas = _mainMenuCanvas;
         EnableCanvas();
+        _androidBackButton.SetToInactive();
     }
 
     public void FinishStory(bool isBeaten, int finishedStoryId)
@@ -124,6 +137,7 @@ public class CanvasManager : MonoBehaviour {
             
         }
         EnableCanvas();
+        _androidBackButton.SetToInactive();
         Destroy(auxCanvas.gameObject);
         _alreadyBeatenLevel = false;
         SelectNextStory();
