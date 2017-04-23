@@ -66,6 +66,23 @@ public class StoryButton : MonoBehaviour {
         _gridScrollRect.ScrollToShow(_thisRectTransform);
         _animator.SetTrigger("Unlock Trigger");
         _button.enabled = true;
+
+        //report social achievement
+
+        //string achievementId = "name_";
+        //achievementId = string.Concat(achievementId, _storyId.ToString());
+
+        //Social.ReportProgress("achievement_name", 100.0, complete =>
+        //{
+        //    if (complete)
+        //    {
+        //        Debug.Log("Progress reported");
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("Could not report progress");
+        //    }
+        //});
     }
 
     public void ChangeSprite()

@@ -245,7 +245,6 @@ public class StoryController : MonoBehaviour {
         _outroText.enabled = true;
         _finishButton.SetActive(true);
 
-
         //TODO modificar clase a guardar y guardar partida  
     }
 
