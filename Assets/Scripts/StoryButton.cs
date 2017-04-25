@@ -69,20 +69,21 @@ public class StoryButton : MonoBehaviour {
 
         //report social achievement
 
-        //string achievementId = "name_";
-        //achievementId = string.Concat(achievementId, _storyId.ToString());
+		string achievementId = "story_";
+        achievementId = string.Concat(achievementId, _storyId.ToString());
 
-        //Social.ReportProgress("achievement_name", 100.0, complete =>
-        //{
-        //    if (complete)
-        //    {
-        //        Debug.Log("Progress reported");
-        //    }
-        //    else
-        //    {
-        //        Debug.Log("Could not report progress");
-        //    }
-        //});
+        Social.ReportProgress(achievementId, 100.0, complete =>
+        {
+            if (complete)
+            {
+                Debug.Log("Progress reported");
+            }
+            else
+            {
+                Debug.Log("Could not report progress");
+					Debug.Log("Trying to report id: " + achievementId);
+            }
+        });
     }
 
     public void ChangeSprite()

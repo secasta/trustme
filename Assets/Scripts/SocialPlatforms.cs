@@ -9,8 +9,6 @@ public class SocialPlatforms : MonoBehaviour {
 	void Start () {
         DontDestroyOnLoad(gameObject);
 
-        GameCenterPlatform.ShowDefaultAchievementCompletionBanner(true);
-
         Social.localUser.Authenticate(success => {
             if (success)
             {
@@ -21,15 +19,17 @@ public class SocialPlatforms : MonoBehaviour {
                 Debug.Log("Failed to authenticate");
             }
         });
+
+		GameCenterPlatform.ShowDefaultAchievementCompletionBanner(true);
     }
 
     void ReportAchievement()
     {
         Debug.Log("Authenticated, checking achievements");
-        Social.LoadAchievements(ProcessLoadedAchievements);
+		Social.LoadAchievementDescriptions(ProcessLoadedAchievements);
     }
 
-    void ProcessLoadedAchievements(IAchievement[] achievements)
+	void ProcessLoadedAchievements(IAchievementDescription[] achievements)
     {
         if (achievements.Length == 0)
         {

@@ -6,6 +6,7 @@ public class AchievementsButton : MonoBehaviour {
 
     public void ShowAchievements()
     {
+		Debug.Log("patata");
         Social.ShowAchievementsUI();
     }
 
