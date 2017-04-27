@@ -23,6 +23,7 @@ public class CanvasManager : MonoBehaviour {
     private VerticalScrollRect _storiesScrollRect;
     private Canvas _randomBeatenCanvas;
     private AndroidBackButton _androidBackButton;
+    private int _nextIndexToAvoid = -1;
 
     public delegate void StoryCompleted(int id);
     public static event StoryCompleted OnStoryCompleted;
@@ -116,7 +117,6 @@ public class CanvasManager : MonoBehaviour {
         {
             if (isBeaten)
             {
-                //TODO Show you've unlocked the story, although the unlocking is done from StoryController
                 _unbeatenBackgroundSprites.RemoveAt(_currentStoryIndex);
                 _unbeatenStoryCanvases.RemoveAt(_currentStoryIndex);
                 _currentCanvas = _storySelectCanvas;
@@ -124,17 +124,20 @@ public class CanvasManager : MonoBehaviour {
                 {
                     OnStoryCompleted(finishedStoryId);
                 }
+                _nextIndexToAvoid = -1;
             }
             else
             {
                 _currentCanvas = _mainMenuCanvas;
+                _nextIndexToAvoid = _currentStoryIndex;
             }
         }
         else
         {
             //TODO story back button disabled
             _currentCanvas = _mainMenuCanvas;
-            
+            _nextIndexToAvoid = _currentStoryIndex;
+
         }
         EnableCanvas();
         _androidBackButton.SetToInactive();
@@ -157,7 +160,14 @@ public class CanvasManager : MonoBehaviour {
     {
         if (_unbeatenStoryCanvases.Count > 0)
         {
-            int rand = Random.Range(0, _unbeatenStoryCanvases.Count);
+            if (_unbeatenStoryCanvases.Count == 1) { _nextIndexToAvoid = -1; }
+            int rand = _currentStoryIndex;
+            do
+            {
+                Debug.Log("Current index: " + rand + ", index to avoid: " + _nextIndexToAvoid);
+                rand = Random.Range(0, _unbeatenStoryCanvases.Count);
+            } while (rand == _nextIndexToAvoid);
+            Debug.Log("Final next index: " + rand);
             _currentStoryIndex = rand;
             _backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
         }

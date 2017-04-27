@@ -81,7 +81,6 @@ public class StoryButton : MonoBehaviour {
             else
             {
                 Debug.Log("Could not report progress");
-					Debug.Log("Trying to report id: " + achievementId);
             }
         });
     }
