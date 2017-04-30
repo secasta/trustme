@@ -40,17 +40,23 @@ public class StoryController : MonoBehaviour {
     private TextParser _parser;
     private CanvasManager _canvasManager;
     private bool _isLevelBeaten = false;
+    private LeaveStoryButton _leaveStoryButton;
+    private AndroidBackButton _androidBackButton;
 
     
 
     void Awake()//En vez de hacerlo manualmente habría que pasar por el parser del txt correspondiente al idioma
     {
         _parser = GetComponent<TextParser>();
-        if (!_parser) { Debug.LogWarning("Couldn't find text parser!"); }
+        if (!_parser) { Debug.LogError("Couldn't find text parser!"); }
         _gaugeManager = _gauge.GetComponent<GaugeManager>();
-        if (!_gaugeManager) { Debug.LogWarning("Couldn't find gauge manager!"); }
+        if (!_gaugeManager) { Debug.LogError("Couldn't find gauge manager!"); }
         _canvasManager = FindObjectOfType<CanvasManager>();
-        if (!_canvasManager){ Debug.LogError("No Canvas Manager found!");}
+        if (!_canvasManager){ Debug.LogError("No Canvas Manager found!", this);}
+        _leaveStoryButton = FindObjectOfType<LeaveStoryButton>();
+        if (!_leaveStoryButton) { Debug.LogError("No back button found in this story", this); }
+        _androidBackButton = FindObjectOfType<AndroidBackButton>();
+        if (!_androidBackButton) { Debug.LogError("No android back button found", this); }
     }
 
     void Start ()
@@ -61,6 +67,11 @@ public class StoryController : MonoBehaviour {
         _chapterIntroText.text = _parser.GetIntroSentence();
         _chapterIntroText.enabled = true;
         _startButton.SetActive(true);
+
+        if (!_canvasManager._isStoryAbortable)
+        {
+            _leaveStoryButton.gameObject.SetActive(false);
+        }
 
         //Remove waiting times when testing
         if (_canvasManager.testing)
@@ -85,7 +96,10 @@ public class StoryController : MonoBehaviour {
         _guyWaiting.enabled = true;
         _currentGuy = _guyWaiting;
         _chapterIntroText.enabled = false;
-        _midPanelText.text = _parser.GetFirstReaction(); 
+        _midPanelText.text = _parser.GetFirstReaction();
+
+        _leaveStoryButton.gameObject.SetActive(false);
+        _androidBackButton.SetToInactive(); 
     }
 
     public void OnFinishButtonPressed()

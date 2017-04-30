@@ -13,7 +13,9 @@ public class CanvasManager : MonoBehaviour {
     public Canvas _storySelectCanvas;
 
     public bool testing = false;
-    
+
+    [HideInInspector]
+    public bool _isStoryAbortable = false;
 
     private int _currentStoryIndex = 0;
     private Canvas _currentCanvas;
@@ -50,10 +52,10 @@ public class CanvasManager : MonoBehaviour {
             _alreadyBeatenLevel = true;
             DisableCanvas();
             _currentCanvas = Instantiate(_storyCanvases[storyId]);
-            //TODO Story back button enabled
             EnableCanvas();
 
-            _androidBackButton.SetToGoToMainPop();
+            _isStoryAbortable = true;
+            _androidBackButton.SetToGoToAlbumAborting();
         }
         else
         {
@@ -69,6 +71,7 @@ public class CanvasManager : MonoBehaviour {
             _currentCanvas = Instantiate(_unbeatenStoryCanvases[_currentStoryIndex]);
             EnableCanvas();
 
+            _isStoryAbortable = false;
             _androidBackButton.SetToInactive();
         }
         else
@@ -76,10 +79,10 @@ public class CanvasManager : MonoBehaviour {
             _alreadyBeatenLevel = true;
             DisableCanvas();
             _currentCanvas = Instantiate(_randomBeatenCanvas);
-            //TODO Story back button enabled
             EnableCanvas();
 
-            _androidBackButton.SetToGoToMainPop();
+            _isStoryAbortable = false;//it could be the other way around
+            _androidBackButton.SetToInactive();
         }
     }
 
@@ -134,7 +137,6 @@ public class CanvasManager : MonoBehaviour {
         }
         else
         {
-            //TODO story back button disabled
             _currentCanvas = _mainMenuCanvas;
             _nextIndexToAvoid = _currentStoryIndex;
 
@@ -144,6 +146,17 @@ public class CanvasManager : MonoBehaviour {
         Destroy(auxCanvas.gameObject);
         _alreadyBeatenLevel = false;
         SelectNextStory();
+    }
+
+    public void AbortStory()
+    {
+        Canvas auxCanvas = _currentCanvas;
+        DisableCanvas();
+        _currentCanvas = _storySelectCanvas;
+        EnableCanvas();
+        _androidBackButton.SetToGoToMain();
+        Destroy(auxCanvas.gameObject);
+        _alreadyBeatenLevel = false;
     }
 
     private void DisableCanvas()

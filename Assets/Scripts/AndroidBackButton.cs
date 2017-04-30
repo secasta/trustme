@@ -8,7 +8,7 @@ public class AndroidBackButton : MonoBehaviour {
     {
         Inactive,
         ToMainMenu,
-        ToMainMenuPopUp
+        ToAlbumAbortingStory
     }
 
     private State _state = State.Inactive;
@@ -30,7 +30,9 @@ public class AndroidBackButton : MonoBehaviour {
                     _canvasManager.GoToMain();
                     _state = State.Inactive;
                     break;
-                case State.ToMainMenuPopUp:
+                case State.ToAlbumAbortingStory:
+                    _canvasManager.AbortStory();
+                    _state = State.ToMainMenu;
                     break;
             }
         }
@@ -46,8 +48,8 @@ public class AndroidBackButton : MonoBehaviour {
         _state = State.ToMainMenu;
     }
 
-    public void SetToGoToMainPop()
+    public void SetToGoToAlbumAborting()
     {
-        _state = State.ToMainMenuPopUp;
+        _state = State.ToAlbumAbortingStory;
     }
 }
