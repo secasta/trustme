@@ -27,6 +27,6 @@ public static class SaveLoad {
         }
     }
 
-    //Poner esto en el awake del monobehavior que llame a SaveLoad para que funciones bien en iOS
+    //Poner esto en el awake del monobehavior que llame a SaveLoad para que funciones bien en iOS:
     //Environment.SetEnvironmentVariable("MONO_REFLECTION_SERIALIZER", "yes");//Si no lo reconoce añadir "System." al principio 
 }

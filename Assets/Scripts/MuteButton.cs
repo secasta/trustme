@@ -23,7 +23,21 @@ public class MuteButton : MonoBehaviour {
         _muteButton = GetComponent<Button>();
         if (!_muteButton) { Debug.LogError("No button component found!", this); }
 	}
-	
+
+    void Start()
+    {
+        float volume = CurrentSettings.GetMasterVolumeOnLaunch();
+        if (volume == 0)
+        {
+            SpriteState spriteState = new SpriteState();
+            spriteState = _muteButton.spriteState;
+            _muteButton.image.sprite = _speakerCrossedIdle;
+            spriteState.pressedSprite = _speakerCrossedPressed;
+            _state = State.Muted;
+            _muteButton.spriteState = spriteState;
+        }
+    }
+
     public void OnButtonPressed()
     {
         SpriteState spriteState = new SpriteState();
