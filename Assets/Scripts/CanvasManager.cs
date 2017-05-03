@@ -32,6 +32,13 @@ public class CanvasManager : MonoBehaviour {
 
     void Awake()
     {
+        //Get references
+        _storiesScrollRect = _storySelectCanvas.GetComponentInChildren<VerticalScrollRect>();
+        if (!_storiesScrollRect) { Debug.LogError("No scroll rect found on children", this); }
+        _androidBackButton = FindObjectOfType<AndroidBackButton>();
+        if (!_androidBackButton) { Debug.LogError("No android back button script found", this); }
+
+        //Reunlock stories on the album
         if (Game.current != null)
         {
             Game.current.ReUnlock();
@@ -41,17 +48,24 @@ public class CanvasManager : MonoBehaviour {
             Debug.LogError("There's no instance of Game");
         }
 
+        //Copy whole lists into unbeaten lists
         _unbeatenStoryCanvases = new List<Canvas>(_storyCanvases);
-        _unbeatenBackgroundSprites = new List<Sprite>(_backgroundSprites);//we're not really using _backgroundSprites at all, but just in case
+        _unbeatenBackgroundSprites = new List<Sprite>(_backgroundSprites);
+
+        //Remove previously beaten stories (indexes) from unbeaten lists
+        foreach (int storyId in Game.current._unlockedStories)
+        {
+            Debug.Log("Removing story " + storyId + " from unbeaten lists.");
+            _unbeatenBackgroundSprites.RemoveAt(storyId);
+            _unbeatenStoryCanvases.RemoveAt(storyId);
+        }        
+    }
+
+    void Start()
+    {
         _currentCanvas = _mainMenuCanvas;
         SelectNextStory();
-        _backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
         EnableCanvas();
-
-        _storiesScrollRect = _storySelectCanvas.GetComponentInChildren<VerticalScrollRect>();
-        if (!_storiesScrollRect) { Debug.LogError("No scroll rect found on children", this); }
-        _androidBackButton = FindObjectOfType<AndroidBackButton>();
-        if (!_androidBackButton) { Debug.LogError("No android back button script found", this); }
     }
 
     public void StartBeatenStory(int storyId)

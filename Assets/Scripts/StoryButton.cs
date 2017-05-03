@@ -80,8 +80,8 @@ public class StoryButton : MonoBehaviour {
         _button.enabled = true;
 
         //report social achievement
-
-		string achievementId = "story_";
+#if !UNITY_EDITOR
+        string achievementId = "story_";
         achievementId = string.Concat(achievementId, _storyId.ToString());
 
         Social.ReportProgress(achievementId, 100.0, complete =>
@@ -95,6 +95,7 @@ public class StoryButton : MonoBehaviour {
                 Debug.Log("Could not report progress");
             }
         });
+#endif
     }
 
     private void ActivateButton()
