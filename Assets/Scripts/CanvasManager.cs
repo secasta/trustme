@@ -32,6 +32,15 @@ public class CanvasManager : MonoBehaviour {
 
     void Awake()
     {
+        if (Game.current != null)
+        {
+            Game.current.ReUnlock();
+        }
+        else
+        {
+            Debug.LogError("There's no instance of Game");
+        }
+
         _unbeatenStoryCanvases = new List<Canvas>(_storyCanvases);
         _unbeatenBackgroundSprites = new List<Sprite>(_backgroundSprites);//we're not really using _backgroundSprites at all, but just in case
         _currentCanvas = _mainMenuCanvas;
@@ -177,10 +186,10 @@ public class CanvasManager : MonoBehaviour {
             int rand = _currentStoryIndex;
             do
             {
-                Debug.Log("Current index: " + rand + ", index to avoid: " + _nextIndexToAvoid);
+                //Debug.Log("Current index: " + rand + ", index to avoid: " + _nextIndexToAvoid);
                 rand = Random.Range(0, _unbeatenStoryCanvases.Count);
             } while (rand == _nextIndexToAvoid);
-            Debug.Log("Final next index: " + rand);
+            //Debug.Log("Final next index: " + rand);
             _currentStoryIndex = rand;
             _backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
         }

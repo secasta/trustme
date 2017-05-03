@@ -25,7 +25,7 @@ public class SocialPlatforms : MonoBehaviour {
 
     void ReportAchievement()
     {
-        Debug.Log("Authenticated, checking achievements");
+        //Debug.Log("Authenticated, checking achievements");
 		Social.LoadAchievementDescriptions(ProcessLoadedAchievements);
     }
 
@@ -37,7 +37,7 @@ public class SocialPlatforms : MonoBehaviour {
         }
         else
         {
-            Debug.Log("Got " + achievements.Length + " achievements");
+            //Debug.Log("Got " + achievements.Length + " achievements");
         }
 
     }

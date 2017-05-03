@@ -15,7 +15,7 @@ public class LanguageSelector : MonoBehaviour {
                 CurrentSettings.Language = SystemLanguage.English;
                 break;
         }
-        Debug.Log(CurrentSettings.Language);
+        //Debug.Log(CurrentSettings.Language);
 	}
 	
 

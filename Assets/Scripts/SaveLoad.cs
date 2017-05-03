@@ -5,14 +5,14 @@ using System.IO;
 
 public static class SaveLoad {
 
-    //public static Game _savedGame;
+    public static Game _savedGame;
 
     public static void Save()
     {
-        //savedGame = Game.current; //static instance in a non-static class
+        _savedGame = Game.current; //static instance in a non-static class
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Create(Path.Combine(Application.persistentDataPath, "savefile.trust"));
-        //bf.Serialize(file, SaveLoad._savedGame);
+        bf.Serialize(file, SaveLoad._savedGame);
         file.Close();
     }
 
@@ -22,8 +22,14 @@ public static class SaveLoad {
         {
             BinaryFormatter bf = new BinaryFormatter();
             FileStream file = File.Open(Path.Combine(Application.persistentDataPath, "savefile.trust"), FileMode.Open);
-            //SaveLoad._savedGame = (Game)bf.Deserialize(file);
+            SaveLoad._savedGame = (Game)bf.Deserialize(file);
+            Game.current = _savedGame;
             file.Close();
+        }
+        else
+        {
+            Debug.Log("File does not exist. Creating new game instance.");
+            Game.current = new Game();
         }
     }
 

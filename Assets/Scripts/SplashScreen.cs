@@ -8,7 +8,13 @@ public class SplashScreen : MonoBehaviour {
 
     public Text _progressText;
 
+    void Awake()
+    {
+        System.Environment.SetEnvironmentVariable("MONO_REFLECTION_SERIALIZER", "yes");
+    }
+
 	void Start () {
+        SaveLoad.Load();
         StartCoroutine(AsynchronousLoad(1));
 	}
 

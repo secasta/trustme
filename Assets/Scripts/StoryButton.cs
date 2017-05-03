@@ -39,11 +39,13 @@ public class StoryButton : MonoBehaviour {
     void OnEnable()
     {
         CanvasManager.OnStoryCompleted += CheckIfButtonShouldBeUnlocked;
+        Game.OnReUnlocking += CheckIfButtonShouldBeActivated;
     }
 
     void OnDisable()
     {
         CanvasManager.OnStoryCompleted -= CheckIfButtonShouldBeUnlocked;
+        Game.OnReUnlocking -= CheckIfButtonShouldBeActivated;
     }
 
     void CheckIfButtonShouldBeUnlocked(int id)
@@ -51,6 +53,16 @@ public class StoryButton : MonoBehaviour {
         if (id == _storyId)
         {
             UnlockButton();
+
+        }
+    }
+
+    void CheckIfButtonShouldBeActivated(int id)
+    {
+        if (id == _storyId)
+        {
+            Debug.Log("Button should be activated, proceeding. Id: " + id);
+            ActivateButton();
 
         }
     }
@@ -83,6 +95,12 @@ public class StoryButton : MonoBehaviour {
                 Debug.Log("Could not report progress");
             }
         });
+    }
+
+    private void ActivateButton()
+    {
+        _button.image.sprite = _storyIcon;
+        _button.enabled = true;
     }
 
     public void ChangeSprite()

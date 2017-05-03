@@ -259,7 +259,8 @@ public class StoryController : MonoBehaviour {
         _outroText.enabled = true;
         _finishButton.SetActive(true);
 
-        //TODO modificar clase a guardar y guardar partida  
+        //modificar clase a guardar (la partida se guarda automáticamente desde Game)
+        Game.current.AddToUnlocked(_parser.GetStoryID()); 
     }
 
     IEnumerator LoseOutro()
