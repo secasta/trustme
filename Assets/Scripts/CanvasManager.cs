@@ -11,6 +11,7 @@ public class CanvasManager : MonoBehaviour {
     public Canvas _mainMenuCanvas;
     public Canvas _settingsCanvas;
     public Canvas _storySelectCanvas;
+    public Canvas _languageSelectionCanvas;
 
     public bool testing = false;
 
@@ -132,6 +133,14 @@ public class CanvasManager : MonoBehaviour {
         _currentCanvas = _mainMenuCanvas;
         EnableCanvas();
         _androidBackButton.SetToInactive();
+    }
+
+    public void GoToLanguageSelector()
+    {
+        DisableCanvas();
+        _currentCanvas = _languageSelectionCanvas;
+        EnableCanvas();
+        _androidBackButton.SetToGoToSettings();
     }
 
     public void FinishStory(bool isBeaten, int finishedStoryId)

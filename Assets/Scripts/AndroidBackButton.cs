@@ -8,7 +8,8 @@ public class AndroidBackButton : MonoBehaviour {
     {
         Inactive,
         ToMainMenu,
-        ToAlbumAbortingStory
+        ToAlbumAbortingStory,
+        ToSettings
     }
 
     private State _state = State.Inactive;
@@ -34,6 +35,10 @@ public class AndroidBackButton : MonoBehaviour {
                     _canvasManager.AbortStory();
                     _state = State.ToMainMenu;
                     break;
+                case State.ToSettings:
+                    _canvasManager.GoToSettings();
+                    _state = State.ToMainMenu;
+                    break;
             }
         }
 	}
@@ -51,5 +56,10 @@ public class AndroidBackButton : MonoBehaviour {
     public void SetToGoToAlbumAborting()
     {
         _state = State.ToAlbumAbortingStory;
+    }
+
+    public void SetToGoToSettings()
+    {
+        _state = State.ToSettings;
     }
 }
