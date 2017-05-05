@@ -1,0 +1,6 @@
+﻿//Do not translate words to the left of the equal sign "="
+play = JUGAR
+start = COMENZAR
+liar = ¡MENTIROSO!
+trusted = ¡TE HAS LIBRADO!
+next = SIGUIENTE

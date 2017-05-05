@@ -61,7 +61,6 @@ public class LanguageButton : MonoBehaviour {
 
     void CheckLanguageAndSwap()
     {
-        Debug.Log("event arrived");
         if (CurrentSettings.Language == _thisLanguage)
         {
             SwapToPressed();

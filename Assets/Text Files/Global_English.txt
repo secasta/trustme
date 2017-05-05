@@ -1,0 +1,6 @@
+﻿//Do not translate words to the left of the equal sign "="
+play = PLAY
+start = START
+liar = LIAR!
+trusted = TRUSTED!
+next = NEXT	
