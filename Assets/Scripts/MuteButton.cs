@@ -17,16 +17,19 @@ public class MuteButton : MonoBehaviour {
     }
 
     private State _state = State.Unmuted;
-    private Button _muteButton; 
+    private Button _muteButton;
+    private AudioController _audioController;
 
     void Awake () {
         _muteButton = GetComponent<Button>();
         if (!_muteButton) { Debug.LogError("No button component found!", this); }
-	}
+        _audioController = FindObjectOfType<AudioController>();
+        if (!_audioController) { Debug.LogError("No audio controller found!", this); }
+    }
 
     void Start()
     {
-        float volume = CurrentSettings.GetMasterVolumeOnLaunch();
+        float volume = CurrentSettings.MasterVolume;
         if (volume == 0)
         {
             SpriteState spriteState = new SpriteState();
@@ -58,5 +61,6 @@ public class MuteButton : MonoBehaviour {
                 break;
         }
         _muteButton.spriteState = spriteState;
+        _audioController.ChangeVolume();
     }
 }

@@ -23,6 +23,10 @@ public static class CurrentSettings{
             MasterVolume = 1f;
             PlayerPrefs.SetFloat(MASTER_VOLUME_KEY, MasterVolume);
         }
-        return PlayerPrefs.GetFloat(MASTER_VOLUME_KEY);
+        else
+        {
+            MasterVolume = PlayerPrefs.GetFloat(MASTER_VOLUME_KEY);
+        }
+        return MasterVolume;
     }
 }
