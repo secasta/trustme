@@ -59,7 +59,7 @@ public class CanvasManager : MonoBehaviour {
         //Remove previously beaten stories (indexes) from unbeaten lists
         foreach (int storyId in Game.current._unlockedStories)
         {
-            Debug.Log("Removing story " + storyId + " from unbeaten lists.");
+            //Debug.Log("Removing story " + storyId + " from unbeaten lists.");
             _unbeatenBackgroundSprites.RemoveAt(storyId);
             _unbeatenStoryCanvases.RemoveAt(storyId);
         }

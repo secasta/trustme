@@ -41,7 +41,7 @@ public class LanguageButton : MonoBehaviour {
 
     public void OnButtonPressed()
     {
-        CurrentSettings.Language = _thisLanguage;
+        CurrentSettings.SetLanguage(_thisLanguage);
         
         if (OnLanguageChanged != null)
         {

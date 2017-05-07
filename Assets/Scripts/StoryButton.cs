@@ -60,7 +60,7 @@ public class StoryButton : MonoBehaviour {
     {
         if (id == _storyId)
         {
-            Debug.Log("Button should be activated, proceeding. Id: " + id);
+            //Debug.Log("Button should be activated, proceeding. Id: " + id);
             ActivateButton();
 
         }
