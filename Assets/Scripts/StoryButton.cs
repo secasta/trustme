@@ -53,7 +53,6 @@ public class StoryButton : MonoBehaviour {
         if (id == _storyId)
         {
             UnlockButton();
-
         }
     }
 

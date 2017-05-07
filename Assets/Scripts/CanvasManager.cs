@@ -38,7 +38,10 @@ public class CanvasManager : MonoBehaviour {
         if (!_storiesScrollRect) { Debug.LogError("No scroll rect found on children", this); }
         _androidBackButton = FindObjectOfType<AndroidBackButton>();
         if (!_androidBackButton) { Debug.LogError("No android back button script found", this); }
+    }
 
+    void Start()
+    {
         //Reunlock stories on the album
         if (Game.current != null)
         {
@@ -59,11 +62,8 @@ public class CanvasManager : MonoBehaviour {
             Debug.Log("Removing story " + storyId + " from unbeaten lists.");
             _unbeatenBackgroundSprites.RemoveAt(storyId);
             _unbeatenStoryCanvases.RemoveAt(storyId);
-        }        
-    }
+        }
 
-    void Start()
-    {
         _currentCanvas = _mainMenuCanvas;
         SelectNextStory();
         EnableCanvas();
