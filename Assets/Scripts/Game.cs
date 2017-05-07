@@ -7,8 +7,8 @@ public class Game{
 
     public static Game current;
     public List<int> _unlockedStories;
-    //public List<int> _achievementsWaitingList;
-    //variable para el tutorial
+    public List<string> _achievementsWaitingList;
+    //variable para el tutorial (bool?)
 
     public delegate void ReUnlocking(int id);
     public static event ReUnlocking OnReUnlocking;
@@ -16,6 +16,7 @@ public class Game{
     public Game()
     {
         _unlockedStories = new List<int>();
+        _achievementsWaitingList = new List<string>();
     }
 
     public void ReUnlock()
@@ -66,6 +67,30 @@ public class Game{
         else
         {
             Debug.Log("This story has been already unlocked.");
+        }
+    }
+
+    public void AddToWaitingList(string achievementId)
+    {
+        _achievementsWaitingList.Add(achievementId);
+    }
+
+    public void ReportWaitingAchievements()
+    {
+        foreach (string achievementId in _achievementsWaitingList)
+        {
+            Social.ReportProgress(achievementId, 100.0, complete =>
+            {
+                if (complete)
+                {
+                    Debug.Log("Progress reported for id: " + achievementId);
+                    _achievementsWaitingList.Remove(achievementId);
+                }
+                else
+                {
+                    Debug.Log("Could not report progress");
+                }
+            });
         }
     }
 

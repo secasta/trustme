@@ -83,6 +83,7 @@ public class StoryButton : MonoBehaviour {
         string achievementId = "story_";
         achievementId = string.Concat(achievementId, _storyId.ToString());
 
+        
         Social.ReportProgress(achievementId, 100.0, complete =>
         {
             if (complete)
@@ -91,6 +92,7 @@ public class StoryButton : MonoBehaviour {
             }
             else
             {
+                Game.current.AddToWaitingList(achievementId);
                 Debug.Log("Could not report progress");
             }
         });

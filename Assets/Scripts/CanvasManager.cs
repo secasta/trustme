@@ -45,6 +45,7 @@ public class CanvasManager : MonoBehaviour {
         //Reunlock stories on the album
         if (Game.current != null)
         {
+            Game.current.ReportWaitingAchievements();
             Game.current.ReUnlock();
         }
         else
