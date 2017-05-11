@@ -66,7 +66,16 @@ public class CanvasManager : MonoBehaviour {
         }
 
         _currentCanvas = _mainMenuCanvas;
-        SelectNextStory();
+        if (Game.current._unlockedStories.Contains(0))//if tutorial has been beaten
+        {
+            SelectNextStory();
+        }
+        else
+        {
+            //Run tutorial
+            _currentStoryIndex = 0;
+            _backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
+        }
         EnableCanvas();
     }
 
