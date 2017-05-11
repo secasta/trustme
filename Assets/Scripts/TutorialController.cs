@@ -1,18 +1,13 @@
-﻿using UnityEngine;
-using System.Collections;
-using UnityEngine.UI;
+﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(TextParser))]
-public class StoryController : MonoBehaviour {
+public class TutorialController : MonoBehaviour {
 
-    public Image _introBackground;
     public Image _chapterBackground;
     public Image _winOutroBackground;
-    public Image[] _loseOutroBackgrounds;
-    public Text _chapterTitle;
-    public Text _chapterIntroText;
-    public GameObject _startButton;
     public GameObject _middlePanel;
     public GameObject _lowerPanel;
     public GameObject _gauge;
@@ -28,7 +23,6 @@ public class StoryController : MonoBehaviour {
     public AnswerButtonScript _answerButton1;
     public AnswerButtonScript _answerButton2;
     public AnswerButtonScript _answerButton3;
-    public GameObject _liarVerdict;
     public GameObject _trustedVerdict;
     public Text _outroText;
     public GameObject _finishButton;
@@ -44,7 +38,7 @@ public class StoryController : MonoBehaviour {
     private LeaveStoryButton _leaveStoryButton;
     private AndroidBackButton _androidBackButton;
 
-    
+
 
     void Awake()//En vez de hacerlo manualmente habría que pasar por el parser del txt correspondiente al idioma
     {
@@ -53,60 +47,38 @@ public class StoryController : MonoBehaviour {
         _gaugeManager = _gauge.GetComponent<GaugeManager>();
         if (!_gaugeManager) { Debug.LogError("Couldn't find gauge manager!"); }
         _canvasManager = FindObjectOfType<CanvasManager>();
-        if (!_canvasManager){ Debug.LogError("No Canvas Manager found!", this);}
-        _leaveStoryButton = FindObjectOfType<LeaveStoryButton>();
-        if (!_leaveStoryButton) { Debug.LogError("No back button found in this story", this); }
+        if (!_canvasManager) { Debug.LogError("No Canvas Manager found!", this); }
         _androidBackButton = FindObjectOfType<AndroidBackButton>();
         if (!_androidBackButton) { Debug.LogError("No android back button found", this); }
     }
 
-    void Start ()
+    void Start()
     {
-        _introBackground.enabled = true;
-        _chapterTitle.text = _parser.GetTitle();
-        _chapterTitle.enabled = true;
-        _chapterIntroText.text = _parser.GetIntroSentence();
-        _chapterIntroText.enabled = true;
-        _startButton.SetActive(true);
-
-        if (!_canvasManager._isStoryAbortable)
-        {
-            _leaveStoryButton.gameObject.SetActive(false);
-        }
-
         //Remove waiting times when testing
         if (_canvasManager.testing)
         {
             _timeForReaction = 0;
-             _timeUntilCheckResponse = 0;
+            _timeUntilCheckResponse = 0;
             _deadTimeBetweenTransitions = 0;
         }
-	}
 
-    public void OnStartButtonPressed()
-    {
         _midPanelButton.enabled = false;
         StartCoroutine(EnableMidPanelButton());
-        _startButton.SetActive(false);
         _chapterBackground.enabled = true;
-        _introBackground.enabled = false;
         _lowerPanel.SetActive(false);
         _middlePanel.SetActive(true);
-        _chapterTitle.enabled = false;
         _gauge.SetActive(true);
         _guyWaiting.enabled = true;
         _currentGuy = _guyWaiting;
-        _chapterIntroText.enabled = false;
         _midPanelText.text = _parser.GetFirstReaction();
 
-        _leaveStoryButton.gameObject.SetActive(false);
-        _androidBackButton.SetToInactive(); 
+        _androidBackButton.SetToInactive();
     }
 
     public void OnFinishButtonPressed()
     {
         _canvasManager.FinishStory(_isLevelBeaten, _parser.GetStoryID());
-        
+
     }
 
     public void OnReactionButtonPressed()
@@ -208,10 +180,6 @@ public class StoryController : MonoBehaviour {
         {
             StartCoroutine(ActivateReaction(reaction));
         }
-        else
-        {
-            StartCoroutine(LoseOutro());
-        }
     }
 
     IEnumerator ActivateReaction(string reaction)
@@ -261,26 +229,6 @@ public class StoryController : MonoBehaviour {
         _finishButton.SetActive(true);
 
         //modificar clase a guardar (la partida se guarda automáticamente desde Game)
-        Game.current.AddToUnlocked(_parser.GetStoryID()); 
+        Game.current.AddToUnlocked(_parser.GetStoryID());
     }
-
-    IEnumerator LoseOutro()
-    {
-        yield return new WaitForSeconds(_timeForReaction);
-        _liarVerdict.SetActive(true);
-        PickOneRandomImage(_loseOutroBackgrounds).enabled = true;
-        _chapterBackground.enabled = false;
-        _currentGuy.enabled = false;
-        _answerOptions.SetActive(false);
-        _outroText.text = _parser.GetOutroSentenceBad();
-        _outroText.enabled = true;
-        _finishButton.SetActive(true);
-    }
-
-    Image PickOneRandomImage(Image[] images)
-    {
-        int numElements = images.Length;
-        int randomIndex = Random.Range(0, numElements);
-        return images[randomIndex];
-    }   
 }
