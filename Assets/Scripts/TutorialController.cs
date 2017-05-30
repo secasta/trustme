@@ -8,9 +8,10 @@ public class TutorialController : MonoBehaviour {
 
     public Image _chapterBackground;
     public Image _winOutroBackground;
+    public GameObject _upperPanel;
     public GameObject _middlePanel;
     public GameObject _lowerPanel;
-    public GameObject _gauge;
+    public GameObject _gaugePrefab;
     public Text _midPanelText;
     public Button _midPanelButton;
     public Image _guyIdle;
@@ -37,6 +38,9 @@ public class TutorialController : MonoBehaviour {
     private bool _isLevelBeaten = false;
     private LeaveStoryButton _leaveStoryButton;
     private AndroidBackButton _androidBackButton;
+    private GameObject _gauge;
+    private bool _isResponsePressed = false;
+    private bool _isReactionPressed = false;
 
 
 
@@ -44,8 +48,12 @@ public class TutorialController : MonoBehaviour {
     {
         _parser = GetComponent<TextParser>();
         if (!_parser) { Debug.LogError("Couldn't find text parser!"); }
+
+        _gauge = Instantiate(_gaugePrefab);
+        _gauge.transform.SetParent(_upperPanel.transform, false);
         _gaugeManager = _gauge.GetComponent<GaugeManager>();
         if (!_gaugeManager) { Debug.LogError("Couldn't find gauge manager!"); }
+
         _canvasManager = FindObjectOfType<CanvasManager>();
         if (!_canvasManager) { Debug.LogError("No Canvas Manager found!", this); }
         _androidBackButton = FindObjectOfType<AndroidBackButton>();
@@ -83,69 +91,108 @@ public class TutorialController : MonoBehaviour {
 
     public void OnReactionButtonPressed()
     {
-        if (_parser.GetRound() > 4) { return; }
-        _parser.PopulateCurrentAnswers();
-        _middlePanel.SetActive(false);
-        _lowerPanel.SetActive(true);
-        _answerOptions.SetActive(true);
-        _answerButton1.SetText(_parser.GetCurrentAnswer(1));
-        _answerButton2.SetText(_parser.GetCurrentAnswer(2));
-        _answerButton3.SetText(_parser.GetCurrentAnswer(3));
-        StartCoroutine(EnableAnswerButtons());
+        if (!_isReactionPressed)
+        {
+            _isReactionPressed = true;
+            if (_parser.GetRound() > 4) { return; }
+            _parser.PopulateCurrentAnswers();
+            _middlePanel.SetActive(false);
+            _lowerPanel.SetActive(true);
+            _answerOptions.SetActive(true);
+            _answerButton1.SetText(_parser.GetCurrentAnswer(1));
+            _answerButton2.SetText(_parser.GetCurrentAnswer(2));
+            _answerButton3.SetText(_parser.GetCurrentAnswer(3));
 
+            _isResponsePressed = false;
+            StartCoroutine(EnableAnswerButtons());
+        }
+        else
+        {
+            Debug.Log("More than one reaction clicks");
+        }
     }
 
     public void OnFirstResponsePressed()
     {
-        _answerButton1.SwapSpriteToPressed();
-        if (_parser.GetCurrentTrustBoolean(1))
+        if (!_isResponsePressed)//nos aseguramos que no se entre dos veces
         {
-            StartCoroutine(_answerButton1.SwapSpriteToGreen(_timeUntilCheckResponse));
-            StartCoroutine(CorrectAnswerBehavior(_parser.GetCurrentReaction(1)));
+            _isResponsePressed = true;
+            DisableAllResponseButtons();
+            _answerButton1.SwapSpriteToPressed();
+            if (_parser.GetCurrentTrustBoolean(1))
+            {
+                StartCoroutine(_answerButton1.SwapSpriteToGreen(_timeUntilCheckResponse));
+                StartCoroutine(CorrectAnswerBehavior(_parser.GetCurrentReaction(1)));
+            }
+            else
+            {
+                StartCoroutine(_answerButton1.SwapSpriteToRed(_timeUntilCheckResponse));
+                StartCoroutine(WrongAnswerBehavior(_parser.GetCurrentReaction(1)));
+            }
         }
         else
         {
-            StartCoroutine(_answerButton1.SwapSpriteToRed(_timeUntilCheckResponse));
-            StartCoroutine(WrongAnswerBehavior(_parser.GetCurrentReaction(1)));
+            Debug.Log("Capturing double click bug");
         }
     }
 
     public void OnSecondResponsePressed()
     {
-        _answerButton2.SwapSpriteToPressed();
-        if (_parser.GetCurrentTrustBoolean(2))
+        if (!_isResponsePressed)
         {
-            StartCoroutine(_answerButton2.SwapSpriteToGreen(_timeUntilCheckResponse));
-            StartCoroutine(CorrectAnswerBehavior(_parser.GetCurrentReaction(2)));
+            _isResponsePressed = true;
+            DisableAllResponseButtons();
+            _answerButton2.SwapSpriteToPressed();
+            if (_parser.GetCurrentTrustBoolean(2))
+            {
+                StartCoroutine(_answerButton2.SwapSpriteToGreen(_timeUntilCheckResponse));
+                StartCoroutine(CorrectAnswerBehavior(_parser.GetCurrentReaction(2)));
+            }
+            else
+            {
+                StartCoroutine(_answerButton2.SwapSpriteToRed(_timeUntilCheckResponse));
+                StartCoroutine(WrongAnswerBehavior(_parser.GetCurrentReaction(2)));
+            }
         }
         else
         {
-            StartCoroutine(_answerButton2.SwapSpriteToRed(_timeUntilCheckResponse));
-            StartCoroutine(WrongAnswerBehavior(_parser.GetCurrentReaction(2)));
+            Debug.Log("Capturing double click bug");
         }
     }
 
     public void OnThirdResponsePressed()
     {
-        _answerButton3.SwapSpriteToPressed();
-        if (_parser.GetCurrentTrustBoolean(3))
+        if (!_isResponsePressed)
         {
-            StartCoroutine(_answerButton3.SwapSpriteToGreen(_timeUntilCheckResponse));
-            StartCoroutine(CorrectAnswerBehavior(_parser.GetCurrentReaction(3)));
+            _isResponsePressed = true;
+            DisableAllResponseButtons();
+            _answerButton3.SwapSpriteToPressed();
+            if (_parser.GetCurrentTrustBoolean(3))
+            {
+                StartCoroutine(_answerButton3.SwapSpriteToGreen(_timeUntilCheckResponse));
+                StartCoroutine(CorrectAnswerBehavior(_parser.GetCurrentReaction(3)));
+            }
+            else
+            {
+                StartCoroutine(_answerButton3.SwapSpriteToRed(_timeUntilCheckResponse));
+                StartCoroutine(WrongAnswerBehavior(_parser.GetCurrentReaction(3)));
+            }
         }
         else
         {
-            StartCoroutine(_answerButton3.SwapSpriteToRed(_timeUntilCheckResponse));
-            StartCoroutine(WrongAnswerBehavior(_parser.GetCurrentReaction(3)));
+            Debug.Log("Capturing double click bug");
         }
     }
 
-    IEnumerator CorrectAnswerBehavior(string reaction)
+    private void DisableAllResponseButtons()
     {
         _answerButton1.DisableButton();
         _answerButton2.DisableButton();
         _answerButton3.DisableButton();
+    }
 
+    IEnumerator CorrectAnswerBehavior(string reaction)
+    {
         yield return new WaitForSeconds(_timeUntilCheckResponse);
 
         _currentGuy.enabled = false;
@@ -165,10 +212,6 @@ public class TutorialController : MonoBehaviour {
 
     IEnumerator WrongAnswerBehavior(string reaction)
     {
-        _answerButton1.DisableButton();
-        _answerButton2.DisableButton();
-        _answerButton3.DisableButton();
-
         yield return new WaitForSeconds(_timeUntilCheckResponse);
 
         _currentGuy.enabled = false;
@@ -176,7 +219,11 @@ public class TutorialController : MonoBehaviour {
         _currentGuy.enabled = true;
         _redFilter.enabled = true;
 
-        if (_gaugeManager.AddRedBarAndContinue())
+        if (_gaugeManager.AddRedBarAndContinue())//in this case we'll always activate the next reaction even if all red bars are active (which shouldn't happen)
+        {
+            StartCoroutine(ActivateReaction(reaction));
+        }
+        else
         {
             StartCoroutine(ActivateReaction(reaction));
         }
@@ -184,6 +231,7 @@ public class TutorialController : MonoBehaviour {
 
     IEnumerator ActivateReaction(string reaction)
     {
+        _isReactionPressed = false;
         _midPanelButton.enabled = false;
         yield return new WaitForSeconds(_timeForReaction);
         StartCoroutine(EnableMidPanelButton());

@@ -8,7 +8,6 @@ public class Game{
     public static Game current;
     public List<int> _unlockedStories;
     public List<string> _achievementsWaitingList;
-    //variable para el tutorial (bool?)
 
     public delegate void ReUnlocking(int id);
     public static event ReUnlocking OnReUnlocking;
