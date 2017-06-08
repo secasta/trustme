@@ -2,5 +2,5 @@
 play = PLAY
 start = START
 liar = LIAR!
-trusted = TRUSTED!
+trusted = YOU'VE BEEN TRUSTED!
 next = NEXT	
