@@ -86,7 +86,6 @@ public class TutorialController : MonoBehaviour {
     public void OnFinishButtonPressed()
     {
         _canvasManager.FinishStory(_isLevelBeaten, _parser.GetStoryID());
-
     }
 
     public void OnReactionButtonPressed()

@@ -27,6 +27,8 @@ public class CanvasManager : MonoBehaviour {
     private Canvas _randomBeatenCanvas;
     private AndroidBackButton _androidBackButton;
     private int _nextIndexToAvoid = -1;
+    private int _numberOfFakeStories = 4;//Maximum is number of stories minus the tutorial and minus one
+    private Sprite[] _fakeStoryOptions;
 
     public delegate void StoryCompleted(int id);
     public static event StoryCompleted OnStoryCompleted;
@@ -38,6 +40,8 @@ public class CanvasManager : MonoBehaviour {
         if (!_storiesScrollRect) { Debug.LogError("No scroll rect found on children", this); }
         _androidBackButton = FindObjectOfType<AndroidBackButton>();
         if (!_androidBackButton) { Debug.LogError("No android back button script found", this); }
+
+        _fakeStoryOptions = new Sprite[_numberOfFakeStories];
     }
 
     void Start()
@@ -72,10 +76,14 @@ public class CanvasManager : MonoBehaviour {
         }
         else
         {
-            //Run tutorial
+            //Next story will be the tutorial
             _currentStoryIndex = 0;
             _backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
+            SelectFakeOptions();
+            //Start Coroutine that begins tutorial
         }
+        RollStories();
+        //Enable blocking panel
         EnableCanvas();
     }
 
@@ -115,7 +123,7 @@ public class CanvasManager : MonoBehaviour {
             _currentCanvas = Instantiate(_randomBeatenCanvas);
             EnableCanvas();
 
-            _isStoryAbortable = false;//it could be the other way around
+            _isStoryAbortable = false;//it could be the other way around, but now it wouldn't return to the main menu
             _androidBackButton.SetToInactive();
         }
     }
@@ -225,18 +233,77 @@ public class CanvasManager : MonoBehaviour {
             //Debug.Log("Final next index: " + rand);
             _currentStoryIndex = rand;
             _backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
+            SelectFakeOptions();
         }
         else
         {
-            //TODO Quitar los botones de la vista
-            //_backgroundImage.sprite = null;
-            //_backgroundImage.enabled = false;
-
             //De momento, si se acaban las historias damos una aleatoria
-            int rand = Random.Range(0, _storyCanvases.Count);
+            int rand = Random.Range(1, _storyCanvases.Count);//Evitamos que vuelva a salir el tutorial
+            _currentStoryIndex = rand;
             _randomBeatenCanvas = _storyCanvases[rand];
             _backgroundImage.sprite = _backgroundSprites[rand];
+            SelectFakeOptions();
         }
     }
 
+    void SelectFakeOptions()
+    {
+        //0 is not an option
+        int rand = 1;
+        int backgroundsVectorIndex = 0;
+        List<int> storyIndexesUsed = new List<int>();
+        bool isIndexAccepted = true;
+
+        Sprite currentStorySprite;
+        if (_unbeatenBackgroundSprites.Count > 0)
+        {
+            currentStorySprite = _unbeatenBackgroundSprites[_currentStoryIndex];
+        }
+        else
+        {
+            currentStorySprite = _backgroundSprites[_currentStoryIndex];
+        }
+
+        int testLoops = 0;
+
+        while (backgroundsVectorIndex < _numberOfFakeStories)
+        {
+            isIndexAccepted = true;
+            rand = Random.Range(1, _backgroundSprites.Count);
+            Debug.Log("Random index: " + rand);
+
+            if (_backgroundSprites[rand] != currentStorySprite)
+            {
+                foreach (int index in storyIndexesUsed)
+                {
+                    if (rand == index)
+                    {
+                        Debug.Log("Random index equals an already used index: " + rand);
+                        isIndexAccepted = false;
+                        break;
+                    }
+                }
+
+                if (isIndexAccepted)
+                {
+                    _fakeStoryOptions[backgroundsVectorIndex] = _backgroundSprites[rand];
+                    storyIndexesUsed.Add(rand);
+                    backgroundsVectorIndex++;
+                    Debug.Log("Index accepted: " + rand);
+                }
+            }
+            testLoops++;
+            if (testLoops > 25)
+            {
+                Debug.Log("Too many loops, get the f*** out of here");
+                break;
+            }
+        }
+    }
+
+    void RollStories()
+    {
+
+        //disable blocking panel
+    }
 }
