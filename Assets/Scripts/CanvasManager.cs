@@ -6,12 +6,15 @@ using System.Collections.Generic;
 public class CanvasManager : MonoBehaviour {
 
     public List<Canvas> _storyCanvases;
-    public Image _backgroundImage;
-    public List<Sprite> _backgroundSprites;
+    public Canvas _firstTutorialCanvas;
+    public Image _randomButtonImage;
+    public List<Sprite> _randomStorySprites;
     public Canvas _mainMenuCanvas;
     public Canvas _settingsCanvas;
     public Canvas _storySelectCanvas;
     public Canvas _languageSelectionCanvas;
+    public GameObject _mainBlockingPanel;
+    public GameObject _playButtonObject;
 
     public bool testing = false;
 
@@ -29,6 +32,8 @@ public class CanvasManager : MonoBehaviour {
     private int _nextIndexToAvoid = -1;
     private int _numberOfFakeStories = 4;//Maximum is number of stories minus the tutorial and minus one
     private Sprite[] _fakeStoryOptions;
+    private Button _randomButton;
+    private bool _breakAndGoToTutorial = false;
 
     public delegate void StoryCompleted(int id);
     public static event StoryCompleted OnStoryCompleted;
@@ -40,6 +45,8 @@ public class CanvasManager : MonoBehaviour {
         if (!_storiesScrollRect) { Debug.LogError("No scroll rect found on children", this); }
         _androidBackButton = FindObjectOfType<AndroidBackButton>();
         if (!_androidBackButton) { Debug.LogError("No android back button script found", this); }
+        _randomButton = _randomButtonImage.GetComponent<Button>();
+        if (!_randomButton) { Debug.LogError("No button found on random button", this); }
 
         _fakeStoryOptions = new Sprite[_numberOfFakeStories];
     }
@@ -59,7 +66,7 @@ public class CanvasManager : MonoBehaviour {
 
         //Copy whole lists into unbeaten lists
         _unbeatenStoryCanvases = new List<Canvas>(_storyCanvases);
-        _unbeatenBackgroundSprites = new List<Sprite>(_backgroundSprites);
+        _unbeatenBackgroundSprites = new List<Sprite>(_randomStorySprites);
 
         //Remove previously beaten stories (indexes) from unbeaten lists
         foreach (int storyId in Game.current._unlockedStories)
@@ -70,6 +77,7 @@ public class CanvasManager : MonoBehaviour {
         }
 
         _currentCanvas = _mainMenuCanvas;
+        //_mainBlockingPanel.SetActive(true);
         if (Game.current._unlockedStories.Contains(0))//if tutorial has been beaten
         {
             SelectNextStory();
@@ -78,12 +86,12 @@ public class CanvasManager : MonoBehaviour {
         {
             //Next story will be the tutorial
             _currentStoryIndex = 0;
-            _backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
+            //_backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
             SelectFakeOptions();
-            //Start Coroutine that begins tutorial
+            _breakAndGoToTutorial = true;
         }
-        RollStories();
-        //Enable blocking panel
+        //StartCoroutine(RollStories());
+        
         EnableCanvas();
     }
 
@@ -163,6 +171,7 @@ public class CanvasManager : MonoBehaviour {
 
     public void FinishStory(bool isBeaten, int finishedStoryId)
     {
+        ResetRandomButton();
         Canvas auxCanvas = _currentCanvas;
         DisableCanvas();
         
@@ -196,6 +205,7 @@ public class CanvasManager : MonoBehaviour {
         Destroy(auxCanvas.gameObject);
         _alreadyBeatenLevel = false;
         SelectNextStory();
+        //StartCoroutine(RollStories());
     }
 
     public void AbortStory()
@@ -221,6 +231,7 @@ public class CanvasManager : MonoBehaviour {
 
     private void SelectNextStory()
     {
+        //_mainBlockingPanel.SetActive(true);
         if (_unbeatenStoryCanvases.Count > 0)
         {
             if (_unbeatenStoryCanvases.Count == 1) { _nextIndexToAvoid = -1; }
@@ -232,8 +243,7 @@ public class CanvasManager : MonoBehaviour {
             } while (rand == _nextIndexToAvoid);
             //Debug.Log("Final next index: " + rand);
             _currentStoryIndex = rand;
-            _backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
-            SelectFakeOptions();
+            //_backgroundImage.sprite = _unbeatenBackgroundSprites[_currentStoryIndex];
         }
         else
         {
@@ -241,9 +251,9 @@ public class CanvasManager : MonoBehaviour {
             int rand = Random.Range(1, _storyCanvases.Count);//Evitamos que vuelva a salir el tutorial
             _currentStoryIndex = rand;
             _randomBeatenCanvas = _storyCanvases[rand];
-            _backgroundImage.sprite = _backgroundSprites[rand];
-            SelectFakeOptions();
+            //_backgroundImage.sprite = _backgroundSprites[rand];
         }
+        SelectFakeOptions();
     }
 
     void SelectFakeOptions()
@@ -261,7 +271,7 @@ public class CanvasManager : MonoBehaviour {
         }
         else
         {
-            currentStorySprite = _backgroundSprites[_currentStoryIndex];
+            currentStorySprite = _randomStorySprites[_currentStoryIndex];
         }
 
         int testLoops = 0;
@@ -269,10 +279,10 @@ public class CanvasManager : MonoBehaviour {
         while (backgroundsVectorIndex < _numberOfFakeStories)
         {
             isIndexAccepted = true;
-            rand = Random.Range(1, _backgroundSprites.Count);
+            rand = Random.Range(1, _randomStorySprites.Count);
             Debug.Log("Random index: " + rand);
 
-            if (_backgroundSprites[rand] != currentStorySprite)
+            if (_randomStorySprites[rand] != currentStorySprite)
             {
                 foreach (int index in storyIndexesUsed)
                 {
@@ -286,7 +296,7 @@ public class CanvasManager : MonoBehaviour {
 
                 if (isIndexAccepted)
                 {
-                    _fakeStoryOptions[backgroundsVectorIndex] = _backgroundSprites[rand];
+                    _fakeStoryOptions[backgroundsVectorIndex] = _randomStorySprites[rand];
                     storyIndexesUsed.Add(rand);
                     backgroundsVectorIndex++;
                     Debug.Log("Index accepted: " + rand);
@@ -301,9 +311,55 @@ public class CanvasManager : MonoBehaviour {
         }
     }
 
-    void RollStories()
+    public void OnRandomStoryButtonPressed()
     {
+        StartCoroutine(RollStories());
+    }
 
-        //disable blocking panel
+    IEnumerator RollStories()
+    {
+        _mainBlockingPanel.SetActive(true);
+        Debug.Log("Blocking panel Active");
+        yield return new WaitForSeconds(0.1f);
+
+        Sprite currentStorySprite;
+        if (_unbeatenBackgroundSprites.Count > 0)
+        {
+            currentStorySprite = _unbeatenBackgroundSprites[_currentStoryIndex];
+        }
+        else
+        {
+            currentStorySprite = _randomStorySprites[_currentStoryIndex];
+        }
+
+        _randomButtonImage.sprite = _fakeStoryOptions[0];
+        for (int i = 1; i < _fakeStoryOptions.Length; i++)
+        {
+            yield return new WaitForSeconds(0.5f);
+            _randomButtonImage.sprite = _fakeStoryOptions[i];
+        }
+        if (_breakAndGoToTutorial)
+        {
+            NextUnbeatenStory();
+            _breakAndGoToTutorial = false;
+        }
+        else
+        {
+            yield return new WaitForSeconds(0.5f);
+            _randomButtonImage.sprite = currentStorySprite;
+
+            _randomButton.enabled = false;
+            yield return new WaitForSeconds(0.3f);
+            _playButtonObject.SetActive(true);    
+        }
+        _mainBlockingPanel.SetActive(false);
+        Debug.Log("Blocking panel Inactive");
+    }
+
+    void ResetRandomButton()
+    {
+        _randomButtonImage.sprite = _randomStorySprites[0];
+        _randomButton.enabled = true;
+        _playButtonObject.SetActive(false);
     }
 }
