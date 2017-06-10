@@ -119,6 +119,7 @@ public class StoryButton : MonoBehaviour {
     {
         yield return new WaitForSeconds(time);
         _canvasManager.GoToMain();
+        _canvasManager.CheckIfAllStoriesUnlocked();
         _blockingPanel.SetActive(false);
         //_gridScrollRect.ResetPosition();
     }

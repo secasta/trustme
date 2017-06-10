@@ -4,3 +4,5 @@ start = COMENZAR
 liar = ¡MENTIROSO!
 trusted = ¡TE HAS LIBRADO!
 next = SIGUIENTE
+understood = ¡ENTENDIDO!
+all unlocked = ¡Felicidades! Has desbloqueado todas las historias del juego. Quizás quieras rejugar alguna. ¿Puede que practicando en otro idioma?

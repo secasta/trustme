@@ -11,7 +11,9 @@ public class MutableText : MonoBehaviour {
         START_,
         LIAR_,
         TRUSTED_,
-        NEXT_
+        NEXT_,
+        UNDERSTOOD_,
+        ALL_UNLOCKED_
     }
 
     public LookupWord _textDisplayed = LookupWord.PLAY_;
@@ -32,6 +34,7 @@ public class MutableText : MonoBehaviour {
     void OnEnable()
     {
         LanguageButton.OnLanguageChanged += DisplayNewText;
+        DisplayNewText();
     }
 
     void OnDisable()

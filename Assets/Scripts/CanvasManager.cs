@@ -15,6 +15,7 @@ public class CanvasManager : MonoBehaviour {
     public Canvas _languageSelectionCanvas;
     public GameObject _mainBlockingPanel;
     public GameObject _playButtonObject;
+    public GameObject _notificationPanel;
 
     public bool testing = false;
 
@@ -375,5 +376,13 @@ public class CanvasManager : MonoBehaviour {
         _randomButtonImage.sprite = _randomStorySprites[0];
         _randomButton.enabled = true;
         _playButtonObject.SetActive(false);
+    }
+
+    public void CheckIfAllStoriesUnlocked()
+    {
+        if (_unbeatenStoryCanvases.Count < 1)
+        {
+            _notificationPanel.SetActive(true);
+        }
     }
 }

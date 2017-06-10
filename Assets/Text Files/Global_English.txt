@@ -3,4 +3,6 @@ play = PLAY
 start = START
 liar = LIAR!
 trusted = YOU'VE BEEN TRUSTED!
-next = NEXT	
+next = NEXT
+understood = GET IT!
+all unlocked = Congrats! You unlocked all stories in the game. Maybe you want to replay some. Possibly practicing another language?

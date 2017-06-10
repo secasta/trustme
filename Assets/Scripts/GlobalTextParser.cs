@@ -45,6 +45,16 @@ public class GlobalTextParser : MonoBehaviour {
                 int index = rawTextLine.IndexOf("=");
                 GlobalText.NEXT_Spanish = rawTextLine.Substring(index + 2);
             }
+            else if(rawTextLine.StartsWith("understood"))
+            {
+                int index = rawTextLine.IndexOf("=");
+                GlobalText.UNDERSTOOD_Spanish = rawTextLine.Substring(index + 2);
+            }
+            else if (rawTextLine.StartsWith("all unlocked"))
+            {
+                int index = rawTextLine.IndexOf("=");
+                GlobalText.ALL_UNLOCKED_Spanish = rawTextLine.Substring(index + 2);
+            }
         }
     }
 
@@ -78,6 +88,17 @@ public class GlobalTextParser : MonoBehaviour {
                 int index = rawTextLine.IndexOf("=");
                 GlobalText.NEXT_English = rawTextLine.Substring(index + 2);
             }
+            else if (rawTextLine.StartsWith("understood"))
+            {
+                int index = rawTextLine.IndexOf("=");
+                GlobalText.UNDERSTOOD_English = rawTextLine.Substring(index + 2);
+            }
+            else if (rawTextLine.StartsWith("all unlocked"))
+            {
+                int index = rawTextLine.IndexOf("=");
+                GlobalText.ALL_UNLOCKED_English = rawTextLine.Substring(index + 2);
+            }
+
         }
     }
 
