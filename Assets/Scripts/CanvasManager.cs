@@ -126,7 +126,15 @@ public class CanvasManager : MonoBehaviour {
         if (_unbeatenStoryCanvases.Count > 0)
         {
             DisableCanvas();
-            _currentCanvas = Instantiate(_unbeatenStoryCanvases[_currentStoryIndex]);
+            if (_breakAndGoToTutorial)
+            {
+                _currentCanvas = Instantiate(_firstTutorialCanvas);
+                _breakAndGoToTutorial = false;
+            }
+            else
+            {
+                _currentCanvas = Instantiate(_unbeatenStoryCanvases[_currentStoryIndex]);
+            }
             EnableCanvas();
 
             _isStoryAbortable = false;
@@ -357,7 +365,6 @@ public class CanvasManager : MonoBehaviour {
         if (_breakAndGoToTutorial)
         {
             NextUnbeatenStory();
-            _breakAndGoToTutorial = false;
         }
         else
         {
