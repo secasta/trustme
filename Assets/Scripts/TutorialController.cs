@@ -27,6 +27,8 @@ public class TutorialController : MonoBehaviour {
     public GameObject _trustedVerdict;
     public Text _outroText;
     public GameObject _finishButton;
+    public Animator _lightsOutPanelAnimator;
+    public GameObject _arrow;
 
     private Image _currentGuy;//Para saber cuál desactivar
     private float _timeForReaction = 1.1f;
@@ -69,18 +71,43 @@ public class TutorialController : MonoBehaviour {
             _timeUntilCheckResponse = 0;
             _deadTimeBetweenTransitions = 0;
         }
-
+        _upperPanel.SetActive(false);
         _midPanelButton.enabled = false;
-        StartCoroutine(EnableMidPanelButton());
-        _chapterBackground.enabled = true;
+        _arrow.SetActive(false);
         _lowerPanel.SetActive(false);
-        _middlePanel.SetActive(true);
-        _gauge.SetActive(true);
+        _chapterBackground.enabled = true;
+        _androidBackButton.SetToInactive();
         _guyWaiting.enabled = true;
         _currentGuy = _guyWaiting;
-        _midPanelText.text = _parser.GetFirstReaction();
 
-        _androidBackButton.SetToInactive();
+        StartCoroutine(ShowIntroMessage());
+    }
+
+    IEnumerator ShowIntroMessage()
+    {
+        yield return new WaitForSeconds(0f);
+        _middlePanel.SetActive(true);
+        _midPanelText.text = _parser.GetIntroSentence();
+        StartCoroutine(FadeOutLightsOutPanel());
+    }
+
+    IEnumerator FadeOutLightsOutPanel()
+    {
+        yield return new WaitForSeconds(2);
+        _middlePanel.SetActive(false);
+        _lightsOutPanelAnimator.SetTrigger("Fade Out");
+        yield return new WaitForSeconds(3);
+        ShowFirstReaction();
+    }
+
+    void ShowFirstReaction()
+    {
+        StartCoroutine(EnableMidPanelButton());
+        _upperPanel.SetActive(true);
+        _middlePanel.SetActive(true);
+        _arrow.SetActive(true);
+        _gauge.SetActive(true);
+        _midPanelText.text = _parser.GetFirstReaction();
     }
 
     public void OnFinishButtonPressed()

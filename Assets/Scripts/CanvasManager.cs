@@ -35,6 +35,7 @@ public class CanvasManager : MonoBehaviour {
     private Sprite[] _fakeStoryOptions;
     private Button _randomButton;
     private bool _breakAndGoToTutorial = false;
+    private float _timeBetweenRandomPics = 0.2f;
 
     public delegate void StoryCompleted(int id);
     public static event StoryCompleted OnStoryCompleted;
@@ -357,24 +358,33 @@ public class CanvasManager : MonoBehaviour {
         }
 
         _randomButtonImage.sprite = _fakeStoryOptions[0];
-        for (int i = 1; i < _fakeStoryOptions.Length; i++)
+
+        for (int j = 0; j < 3; j++)
         {
-            yield return new WaitForSeconds(0.5f);
-            _randomButtonImage.sprite = _fakeStoryOptions[i];
-        }
-        if (_breakAndGoToTutorial)
-        {
-            NextUnbeatenStory();
-        }
-        else
-        {
-            yield return new WaitForSeconds(0.5f);
+            for (int i = 1; i < _fakeStoryOptions.Length; i++)
+            {
+                yield return new WaitForSeconds(_timeBetweenRandomPics);
+                _randomButtonImage.sprite = _fakeStoryOptions[i];
+            }
+            yield return new WaitForSeconds(_timeBetweenRandomPics);
+            if (_breakAndGoToTutorial)
+            {
+                NextUnbeatenStory();
+                break;
+            }
             _randomButtonImage.sprite = currentStorySprite;
+        }
+
+        if (!_breakAndGoToTutorial)
+        {
+            //yield return new WaitForSeconds(_timeBetweenRandomPics);
+            //_randomButtonImage.sprite = currentStorySprite;
 
             _randomButton.enabled = false;
-            yield return new WaitForSeconds(0.3f);
+            yield return new WaitForSeconds(0.5f);
             _playButtonObject.SetActive(true);    
         }
+
         _mainBlockingPanel.SetActive(false);
     }
 
